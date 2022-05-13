@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React, {memo, useState} from 'react';
 import {Image, Text, View} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -18,6 +18,15 @@ interface Props {
 }
 
 const FeedPost: React.FC<Props> = ({post}) => {
+  const [isDescriptionExpanded, setIsDescriptionExpanded] =
+    useState<boolean>(false);
+  const [isPostLiked, setIsPostLiked] = useState<boolean>(false);
+
+  const toggleDescriptionExpanded = () =>
+    setIsDescriptionExpanded(value => !value); //? Updating local state in 'real-time' and not async 3.5 State for Likes @ 15:00
+
+  const togglePostLike = () => setIsPostLiked(value => !value);
+
   return (
     <View style={styles.post}>
       {/* Header */}
@@ -56,10 +65,11 @@ const FeedPost: React.FC<Props> = ({post}) => {
         {/* icons */}
         <View style={styles.iconContainer}>
           <AntDesign
-            name={'hearto'}
+            onPress={togglePostLike}
+            name={isPostLiked ? 'heart' : 'hearto'}
             size={24}
             style={styles.icon}
-            color={colors.black}
+            color={isPostLiked ? 'red' : colors.black}
           />
           <Ionicons
             name="chatbubble-outline"
@@ -93,8 +103,12 @@ const FeedPost: React.FC<Props> = ({post}) => {
         </Text>
 
         {/* post description */}
-        <Text style={styles.text}>
+        <Text style={styles.text} numberOfLines={isDescriptionExpanded ? 0 : 3}>
           <Text style={styles.bold}>jaymondlana</Text> {post?.description}
+        </Text>
+
+        <Text onPress={toggleDescriptionExpanded}>
+          {isDescriptionExpanded ? 'less' : 'more'}
         </Text>
 
         {/* comments */}
