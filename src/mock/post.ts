@@ -83,8 +83,8 @@ export const POSTS: IPost[] = [
       id: 'u1',
       image:
         'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg',
-      username: 'vadimnotjustdev',
-      name: 'vadim',
+      username: 'jaymondlana',
+      name: 'jay',
     },
     nofComments: 11,
     nofLikes: 34,
@@ -94,8 +94,8 @@ export const POSTS: IPost[] = [
         comment: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. H',
         user: {
           id: 'u1',
-          username: 'vadimnotjustdev',
-          name: 'vadim',
+          username: 'jaymondlana',
+          name: 'jay',
         },
       },
       {

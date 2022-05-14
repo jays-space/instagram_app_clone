@@ -1,5 +1,5 @@
 import React, {memo, useState} from 'react';
-import {Image, Text, View} from 'react-native';
+import {Image, Pressable, Text, View} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -8,16 +8,22 @@ import Feather from 'react-native-vector-icons/Feather';
 // TYPES
 import {IPost} from '../../types/models';
 
+// COMPONENTS
+import {Comment} from '../Comment';
+import {DoublePressable} from '../DoublePressable';
+import {Carousel} from '../Carousel';
+import {VideoPlayer} from '../VideoPlayer';
+
 // STYLES
 import {styles} from './FeedPost.styles';
 import {colors} from '../../theme/colors';
-import {Comment} from '../Comment';
 
-interface Props {
+interface IFeedPost {
   post: IPost;
+  isViewable: boolean;
 }
 
-const FeedPost: React.FC<Props> = ({post}) => {
+const FeedPost = ({post, isViewable}: IFeedPost) => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(false);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(false);
@@ -26,6 +32,29 @@ const FeedPost: React.FC<Props> = ({post}) => {
     setIsDescriptionExpanded(value => !value); //? Updating local state in 'real-time' and not async 3.5 State for Likes @ 15:00
 
   const togglePostLike = () => setIsPostLiked(value => !value);
+
+  let content = null;
+  if (post.image) {
+    content = (
+      <DoublePressable onDoublePress={togglePostLike}>
+        <Image
+          source={{
+            uri: post?.image,
+          }}
+          resizeMode="cover"
+          style={styles.image}
+        />
+      </DoublePressable>
+    );
+  } else if (post.images) {
+    content = <Carousel images={post.images} onDoublePress={togglePostLike} />;
+  } else if (post.video) {
+    content = (
+      <DoublePressable onDoublePress={togglePostLike}>
+        <VideoPlayer video={post.video} isViewable={isViewable} />
+      </DoublePressable>
+    );
+  }
 
   return (
     <View style={styles.post}>
@@ -52,25 +81,20 @@ const FeedPost: React.FC<Props> = ({post}) => {
       </View>
 
       {/* Content */}
-      <Image
-        source={{
-          uri: post?.image,
-        }}
-        resizeMode="cover"
-        style={styles.image}
-      />
+      {content}
 
       {/* Footer */}
       <View style={styles.footer}>
         {/* icons */}
         <View style={styles.iconContainer}>
-          <AntDesign
-            onPress={togglePostLike}
-            name={isPostLiked ? 'heart' : 'hearto'}
-            size={24}
-            style={styles.icon}
-            color={isPostLiked ? 'red' : colors.black}
-          />
+          <Pressable onPress={togglePostLike}>
+            <AntDesign
+              name={isPostLiked ? 'heart' : 'hearto'}
+              size={24}
+              style={styles.icon}
+              color={isPostLiked ? colors.accent : colors.black}
+            />
+          </Pressable>
           <Ionicons
             name="chatbubble-outline"
             size={24}
