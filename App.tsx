@@ -3,11 +3,13 @@ import {SafeAreaView, StyleSheet} from 'react-native';
 
 // SCREENS
 import {HomeScreen} from './src/screens/Home';
+import {CommentsScreen} from './src/screens/Comments';
 
 const App = () => {
   return (
     <SafeAreaView style={styles.root}>
-      <HomeScreen />
+      <CommentsScreen />
+      {/* <HomeScreen /> */}
     </SafeAreaView>
   );
 };
