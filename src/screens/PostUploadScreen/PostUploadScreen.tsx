@@ -1,14 +1,29 @@
 import React, {useEffect, useState} from 'react';
 import {Text, SafeAreaView, StyleSheet, View, Pressable} from 'react-native';
-import {Camera, CameraType} from 'expo-camera';
+import {Camera, CameraType, FlashMode} from 'expo-camera';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 // STYLES
 import {colors} from '../../theme/colors';
 
+const FLASH_MODES = [
+  FlashMode.off,
+  FlashMode.on,
+  FlashMode.auto,
+  FlashMode.torch,
+];
+
+const flashModeToIcon = {
+  [FlashMode.off]: 'flash-off',
+  [FlashMode.on]: 'flash-on',
+  [FlashMode.auto]: 'flash-auto',
+  [FlashMode.torch]: 'highlight',
+};
+
 const PostUploadScreen = () => {
   const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
-  const [cameraType, setCameraType] = useState(CameraType.back);
+  const [cameraType, setCameraType] = useState<CameraType>(CameraType.back);
+  const [flashType, setFlashType] = useState<FlashMode>(FlashMode.off);
 
   //* Request permissions from user on component render.
   useEffect(() => {
@@ -34,6 +49,17 @@ const PostUploadScreen = () => {
     );
   };
 
+  //   Select through a list of flash types
+  const selectFlashType = () => {
+    // get index of current selected flash mode
+    const currentIndex = FLASH_MODES.indexOf(flashType);
+    // if currentIndex is at the last index in FLASH_MODES arr, set the next index to 0, else +1
+    const nextIndex =
+      currentIndex === FLASH_MODES.length - 1 ? 0 : currentIndex + 1;
+
+    setFlashType(FLASH_MODES[nextIndex]);
+  };
+
   //* if application is awaiting response, return loading
   if (hasPermissions === null) {
     return <Text>Loading...</Text>;
@@ -47,11 +73,25 @@ const PostUploadScreen = () => {
   //* if application is permitted both camera or mic permissions, allow access to camera features
   return (
     <SafeAreaView style={styles.root}>
-      <Camera type={cameraType} ratio="4:3" style={styles.camera} />
+      <Camera
+        style={styles.camera}
+        type={cameraType}
+        ratio="4:3"
+        flashMode={flashType}
+      />
 
       <View style={[styles.buttonsContainer, styles.buttonsContainerTop]}>
         <MaterialIcons name="close" size={30} color={colors.white} />
-        <MaterialIcons name="flash-off" size={30} color={colors.white} />
+
+        {/* Toggle camera flash mode */}
+        <Pressable onPress={selectFlashType}>
+          <MaterialIcons
+            name={flashModeToIcon[flashType]}
+            size={30}
+            color={colors.white}
+          />
+        </Pressable>
+
         <MaterialIcons name="settings" size={30} color={colors.white} />
       </View>
 
