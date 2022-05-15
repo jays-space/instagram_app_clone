@@ -6,11 +6,13 @@ import {HomeScreen} from './src/screens/Home';
 import {CommentsScreen} from './src/screens/Comments';
 import {ProfileScreen} from './src/screens/Profile';
 import {EditProfileScreen} from './src/screens/EditProfile';
+import {PostUploadScreen} from './src/screens/PostUploadScreen';
 
 const App = () => {
   return (
     <SafeAreaView style={styles.root}>
-      <EditProfileScreen />
+      <PostUploadScreen />
+      {/* <EditProfileScreen /> */}
       {/* <ProfileScreen /> */}
       {/* <CommentsScreen /> */}
       {/* <HomeScreen /> */}
