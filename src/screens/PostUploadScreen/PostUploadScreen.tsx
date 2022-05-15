@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Text, SafeAreaView, StyleSheet, View, Pressable} from 'react-native';
 import {Camera, CameraType, FlashMode} from 'expo-camera';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -22,8 +22,11 @@ const flashModeToIcon = {
 
 const PostUploadScreen = () => {
   const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
+  const [isCameraReady, setIsCameraReady] = useState<boolean>(false);
   const [cameraType, setCameraType] = useState<CameraType>(CameraType.back);
   const [flashType, setFlashType] = useState<FlashMode>(FlashMode.off);
+
+  const cameraRef = useRef<Camera>(null);
 
   //* Request permissions from user on component render.
   useEffect(() => {
@@ -60,6 +63,12 @@ const PostUploadScreen = () => {
     setFlashType(FLASH_MODES[nextIndex]);
   };
 
+  const takePicture = async () => {
+    const result = await cameraRef.current?.takePictureAsync();
+
+    console.log('result: ', result);
+  };
+
   //* if application is awaiting response, return loading
   if (hasPermissions === null) {
     return <Text>Loading...</Text>;
@@ -74,10 +83,12 @@ const PostUploadScreen = () => {
   return (
     <SafeAreaView style={styles.root}>
       <Camera
+        ref={cameraRef}
         style={styles.camera}
         type={cameraType}
         ratio="4:3"
         flashMode={flashType}
+        onCameraReady={() => setIsCameraReady(true)}
       />
 
       <View style={[styles.buttonsContainer, styles.buttonsContainerTop]}>
@@ -97,7 +108,13 @@ const PostUploadScreen = () => {
 
       <View style={[styles.buttonsContainer, styles.buttonsContainerBottom]}>
         <MaterialIcons name="photo-library" size={30} color={colors.white} />
-        <View style={styles.circle} />
+
+        {/* Take picture/video button */}
+        {isCameraReady && (
+          <Pressable onPress={takePicture}>
+            <View style={styles.circle} />
+          </Pressable>
+        )}
 
         {/* Toggle camera type */}
         <Pressable onPress={flipCamera}>
