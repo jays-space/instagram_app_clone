@@ -1,6 +1,20 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Text, SafeAreaView, StyleSheet, View, Pressable} from 'react-native';
-import {Camera, CameraType, FlashMode} from 'expo-camera';
+import {
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Pressable,
+  Platform,
+} from 'react-native';
+import {
+  Camera,
+  CameraPictureOptions,
+  CameraRecordingOptions,
+  CameraType,
+  FlashMode,
+  VideoQuality,
+} from 'expo-camera';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 // STYLES
@@ -23,6 +37,7 @@ const flashModeToIcon = {
 const PostUploadScreen = () => {
   const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
   const [isCameraReady, setIsCameraReady] = useState<boolean>(false);
+  const [isCameraRecording, setIsCameraRecording] = useState<boolean>(false);
   const [cameraType, setCameraType] = useState<CameraType>(CameraType.back);
   const [flashType, setFlashType] = useState<FlashMode>(FlashMode.off);
 
@@ -64,9 +79,67 @@ const PostUploadScreen = () => {
   };
 
   const takePicture = async () => {
-    const result = await cameraRef.current?.takePictureAsync();
+    if (!isCameraReady || !cameraRef.current || isCameraRecording) {
+      return;
+    }
 
-    console.log('result: ', result);
+    const options: CameraPictureOptions = {
+      quality: 0.5, //* Range: 0- extremely compressed & low size to 1- compression for max quality
+      base64: false, //* include base64 version of the image
+      skipProcessing: Platform.OS === 'android' ? false : true, //* on android the 'processing' step messes up the orientation on some devices
+    };
+
+    try {
+      const result = await cameraRef.current.takePictureAsync(options);
+      console.log('result: ', result); //! notJustDev 3.14 @ 45.42
+    } catch (e) {
+      console.log(e);
+    }
+
+    /**
+     * result = {
+     * height: number,
+     * width: number,
+     * uri: string,
+     * }
+     */
+  };
+
+  const startVideoRecording = async () => {
+    if (!isCameraReady || !cameraRef.current || isCameraRecording) {
+      return;
+    }
+
+    const options: CameraRecordingOptions = {
+      quality: VideoQuality['4:3'], //* 2160p, 1080p, 720p, 480p, 4:3
+      maxDuration: 60, //* Max video duration in seconds
+      maxFileSize: 10 * 1024 * 1024, //* Max video file size in bytes
+      mute: false,
+    };
+
+    setIsCameraRecording(true);
+
+    try {
+      const result = await cameraRef.current.recordAsync(options);
+      console.log('result: ', result); //! notJustDev 3.14 @ 1:00:30
+    } catch (e) {
+      console.log(e);
+    }
+
+    /**
+     * result = {
+     * uri: string,
+     * }
+     */
+
+    setIsCameraRecording(false);
+  };
+
+  const stopVideoRecording = () => {
+    if (isCameraRecording) {
+      cameraRef.current?.stopRecording;
+      setIsCameraRecording(false);
+    }
   };
 
   //* if application is awaiting response, return loading
@@ -111,8 +184,16 @@ const PostUploadScreen = () => {
 
         {/* Take picture/video button */}
         {isCameraReady && (
-          <Pressable onPress={takePicture}>
-            <View style={styles.circle} />
+          <Pressable
+            onPress={takePicture}
+            onLongPress={startVideoRecording}
+            onPressOut={stopVideoRecording}>
+            <View
+              style={[
+                styles.circle,
+                isCameraRecording ? styles.recording : styles.notRecording,
+              ]}
+            />
           </Pressable>
         )}
 
@@ -134,7 +215,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
 
-    backgroundColor: colors.transparent.black[60],
+    backgroundColor: colors.black,
   },
   camera: {
     width: '100%',
@@ -160,7 +241,12 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
 
     borderRadius: 75,
+  },
+  notRecording: {
     backgroundColor: colors.white,
+  },
+  recording: {
+    backgroundColor: colors.accent,
   },
 });
 
