@@ -51,7 +51,7 @@ const FeedPost = ({post, isViewable}: IFeedPost) => {
   } else if (post.video) {
     content = (
       <DoublePressable onDoublePress={togglePostLike}>
-        <VideoPlayer video={post.video} isViewable={isViewable} />
+        <VideoPlayer video={post.video} paused={!isViewable} />
       </DoublePressable>
     );
   }

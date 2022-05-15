@@ -8,12 +8,14 @@ import {FeedPost} from '../../components/FeedPost';
 import {POSTS} from '../../mock/post';
 
 const HomeScreen = () => {
+  // const [activePostId, setActivePOstId] = useState<string | null>(null);
   const [viewableItemIndex, setViewableItemIndex] = useState<number>(0);
 
   const viewabilityConfig: ViewabilityConfig = {
     itemVisiblePercentThreshold: 51,
   };
 
+  //* could also use the item id as a basis for comparison instead of indexes
   const onViewableItemsChanged = useRef(
     ({viewableItems}: {viewableItems: Array<ViewToken>}) => {
       if (viewableItems.length > 0) {
@@ -30,7 +32,7 @@ const HomeScreen = () => {
         <FeedPost
           key={post.id}
           post={post}
-          isViewable={viewableItemIndex === fIndex}
+          isViewable={viewableItemIndex === fIndex} // is post visible
         />
       )}
       showsVerticalScrollIndicator={false}
