@@ -20,10 +20,10 @@ import {colors} from '../../theme/colors';
 
 interface IFeedPost {
   post: IPost;
-  isViewable: boolean;
+  isViewable?: boolean | null;
 }
 
-const FeedPost = ({post, isViewable}: IFeedPost) => {
+const FeedPost = ({post, isViewable = null}: IFeedPost) => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(false);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(false);
