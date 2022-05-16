@@ -1,6 +1,7 @@
 import {RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import {MaterialTopTabNavigationProp} from '@react-navigation/material-top-tabs';
 
 export type RootNavigatorParamsList = {
   Home: undefined;
@@ -24,6 +25,14 @@ export type CurrentUserProfileNavigationProp = BottomTabNavigationProp<
   BottomTabNavigatorParamsList,
   'CurrentUserProfile'
 >;
+
+export type SearchTopTabNavigatorParamsList = {
+  Users: undefined;
+  Posts: undefined;
+};
+
+export type OtherUserProfileFromSearchNavigationProp =
+  MaterialTopTabNavigationProp<HomeStackNavigatorParamsList, 'Users'>;
 
 export type HomeStackNavigatorParamsList = {
   Feed: undefined;

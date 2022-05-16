@@ -10,8 +10,8 @@ import {BottomTabNavigatorParamsList} from './types';
 // NAVIGATORS
 import HomeStackNavigator from './HomeStackNavigator';
 import ProfileStackNavigator from './ProfileStackNavigator';
-import {HomeScreen} from '../screens/Home';
 import {PostUploadScreen} from '../screens/PostUploadScreen';
+import SearchTabNavigator from './SearchTabNavigator';
 
 // STYLES
 import {colors} from '../theme/colors';
@@ -38,8 +38,9 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Search"
-        component={HomeScreen}
+        component={SearchTabNavigator}
         options={{
+          headerShown: false,
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name="search" size={size} color={color} />
           ),
