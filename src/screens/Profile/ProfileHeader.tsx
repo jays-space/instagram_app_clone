@@ -1,6 +1,9 @@
 import {View, Text, Image} from 'react-native';
 import React, {memo} from 'react';
 
+// TYPES
+import {ProfileNavigationProp} from '../../navigation/types';
+
 // COMPONENTS
 import {Button} from '../../components/Button';
 
@@ -9,8 +12,13 @@ import {styles} from './ProfileScreen.styles';
 
 // MOCK
 import user from '../../mock/user.json';
+import {useNavigation} from '@react-navigation/native';
 
 const ProfileHeader = () => {
+  const navigation = useNavigation<ProfileNavigationProp>();
+  const navigateToEditProfile = () => {
+    navigation.navigate('EditProfile');
+  };
   return (
     <View style={styles.root}>
       <View style={styles.header}>
@@ -42,10 +50,7 @@ const ProfileHeader = () => {
 
       {/* Tab buttons container  */}
       <View style={styles.tabButtons}>
-        <Button
-          title="Edit Profile"
-          onPress={() => console.warn('edit profile pressed')}
-        />
+        <Button title="Edit Profile" onPress={navigateToEditProfile} />
         <Button
           title="Another Button"
           onPress={() => console.warn('another button pressed')}

@@ -1,44 +1,32 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Image, StyleSheet} from 'react-native';
+
+// TYPES
+import {RootNavigatorParamsList} from './types';
 
 // SCREENS
-import {HomeScreen} from '../screens/Home';
-import {ProfileScreen} from '../screens/Profile';
+import TabNavigator from './BottomTabNavigator';
 import {CommentsScreen} from '../screens/Comments';
-import {EditProfileScreen} from '../screens/EditProfile';
-import {PostUploadScreen} from '../screens/PostUploadScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootNavigatorParamsList>();
 
-const RootNavigation = () => {
+const Navigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          name="Feed"
-          component={HomeScreen}
-          options={{headerTitle: HeaderTitle, headerTitleAlign: 'center'}}
+          name="Home"
+          component={TabNavigator}
+          options={{
+            headerShown: false,
+            headerTitleAlign: 'center',
+          }}
         />
-        <Stack.Screen
-          name="UserProfile"
-          component={ProfileScreen}
-          options={{title: 'Profile'}}
-        />
+        <Stack.Screen name="Comments" component={CommentsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const HeaderTitle = () => (
-  <Image
-    source={require('../assets/images/logo.png')}
-    resizeMode="contain"
-    style={styles.logo}
-  />
-);
-
-const styles = StyleSheet.create({logo: {width: 150, height: 40}});
-
-export default RootNavigation;
+export default Navigation;
