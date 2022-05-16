@@ -1,5 +1,5 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {LinkingOptions, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 // TYPES
@@ -11,9 +11,30 @@ import {CommentsScreen} from '../screens/Comments';
 
 const Stack = createNativeStackNavigator<RootNavigatorParamsList>();
 
+const linkingConfig: LinkingOptions<RootNavigatorParamsList> = {
+  prefixes: ['jaysinsta://'],
+  config: {
+    initialRouteName: 'Home',
+    screens: {
+      Comments: 'comments', // jaysinsta://comments
+      // jaysinsta://user/123
+      Home: {
+        screens: {
+          HomeStack: {
+            initialRouteName: 'Feed',
+            screens: {
+              OtherUserProfile: 'user:/userID',
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 const Navigation = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linkingConfig}>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
