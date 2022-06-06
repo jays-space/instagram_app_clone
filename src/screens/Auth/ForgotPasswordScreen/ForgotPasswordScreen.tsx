@@ -1,11 +1,16 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import FormInput from '../components/FormInput';
-import CustomButton from '../components/CustomButton';
-import SocialSignInButtons from '../components/SocialSignInButtons';
+import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/core';
 import {useForm} from 'react-hook-form';
+import {Auth} from 'aws-amplify';
+
+// TYPES
 import {ForgotPasswordNavigationProp} from '../../../types/navigation';
+
+// COMPONENTS
+import FormInput from '../components/FormInput';
+import CustomButton from '../components/CustomButton';
+// import SocialSignInButtons from '../components/SocialSignInButtons';
 
 type ForgotPasswordData = {
   username: string;
@@ -15,9 +20,28 @@ const ForgotPasswordScreen = () => {
   const {control, handleSubmit} = useForm<ForgotPasswordData>();
   const navigation = useNavigation<ForgotPasswordNavigationProp>();
 
-  const onSendPressed = (data: ForgotPasswordData) => {
-    console.warn(data);
-    navigation.navigate('New password');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onSendPressed = async ({username}: ForgotPasswordData) => {
+    if (isLoading) {
+      return;
+    } else {
+      setIsLoading(true);
+    }
+
+    try {
+      const response = await Auth.forgotPassword(username);
+      Alert.alert(
+        'Check your email',
+        `The code has been sent to ${response.CodeDeliveryDetails.Destination}`,
+      );
+
+      navigation.navigate('New password');
+    } catch (e) {
+      Alert.alert('Oopsie!', (e as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSignInPress = () => {
@@ -38,7 +62,10 @@ const ForgotPasswordScreen = () => {
           }}
         />
 
-        <CustomButton text="Send" onPress={handleSubmit(onSendPressed)} />
+        <CustomButton
+          text={isLoading ? 'Loading...' : 'Send'}
+          onPress={handleSubmit(onSendPressed)}
+        />
 
         <CustomButton
           text="Back to Sign in"

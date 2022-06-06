@@ -1,12 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {Auth} from 'aws-amplify';
+import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
+import {useNavigation} from '@react-navigation/core';
+import {useForm} from 'react-hook-form';
 
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+// TYPES
+import {SignUpNavigationProp} from '../../../types/navigation';
+
+// COMPONENTS
 import FormInput from '../components/FormInput';
 import CustomButton from '../components/CustomButton';
 import SocialSignInButtons from '../components/SocialSignInButtons';
-import {useNavigation} from '@react-navigation/core';
-import {useForm} from 'react-hook-form';
-import {SignUpNavigationProp} from '../../../types/navigation';
+
+// STYLES
 import {colors} from '../../../theme/colors';
 
 const EMAIL_REGEX =
@@ -24,11 +30,39 @@ type SignUpData = {
 
 const SignUpScreen = () => {
   const {control, handleSubmit, watch} = useForm<SignUpData>();
-  const pwd = watch('password');
   const navigation = useNavigation<SignUpNavigationProp>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onRegisterPressed = ({name, email, username, password}: SignUpData) => {
-    navigation.navigate('Confirm email', {username});
+  const pwd = watch('password');
+
+  const onRegisterPressed = async ({
+    name,
+    email,
+    username,
+    password,
+  }: SignUpData) => {
+    if (isLoading) {
+      return;
+    } else {
+      setIsLoading(true);
+    }
+
+    // custom fields that were added in the auth
+    let attributes = {
+      name,
+      email,
+    };
+
+    try {
+      Auth.signUp({username, password, attributes});
+
+      // to confirm email page
+      navigation.navigate('Confirm email', {username});
+    } catch (e) {
+      Alert.alert('Oopsie!', (e as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSignInPress = () => {
@@ -119,7 +153,7 @@ const SignUpScreen = () => {
         />
 
         <CustomButton
-          text="Register"
+          text={isLoading ? 'Loading...' : 'Register'}
           onPress={handleSubmit(onRegisterPressed)}
         />
 

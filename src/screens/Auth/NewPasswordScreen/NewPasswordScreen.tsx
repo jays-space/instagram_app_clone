@@ -1,11 +1,16 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import FormInput from '../components/FormInput';
-import CustomButton from '../components/CustomButton';
-import SocialSignInButtons from '../components/SocialSignInButtons';
+import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
+import {Auth} from 'aws-amplify';
+
+// TYPES
 import {NewPasswordNavigationProp} from '../../../types/navigation';
+
+// COMPONENTS
+import FormInput from '../components/FormInput';
+import CustomButton from '../components/CustomButton';
+// import SocialSignInButtons from '../components/SocialSignInButtons';
 
 type NewPasswordType = {
   username: string;
@@ -14,13 +19,33 @@ type NewPasswordType = {
 };
 
 const NewPasswordScreen = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const {control, handleSubmit} = useForm<NewPasswordType>();
 
   const navigation = useNavigation<NewPasswordNavigationProp>();
 
-  const onSubmitPressed = (data: NewPasswordType) => {
-    console.warn(data);
-    navigation.navigate('Sign in');
+  const onSubmitPressed = async ({
+    code,
+    password,
+    username,
+  }: NewPasswordType) => {
+    if (isLoading) {
+      // if currently loading => return
+      return;
+    } else {
+      setIsLoading(true);
+    }
+
+    try {
+      await Auth.forgotPasswordSubmit(username, code, password);
+
+      navigation.navigate('Sign in');
+    } catch (e) {
+      Alert.alert('Oopsie!', (e as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSignInPress = () => {
@@ -60,7 +85,10 @@ const NewPasswordScreen = () => {
           }}
         />
 
-        <CustomButton text="Submit" onPress={handleSubmit(onSubmitPressed)} />
+        <CustomButton
+          text={isLoading ? 'Loading...' : 'Submit'}
+          onPress={handleSubmit(onSubmitPressed)}
+        />
 
         <CustomButton
           text="Back to Sign in"

@@ -1,20 +1,25 @@
-import React from 'react';
-
+import React, {useState} from 'react';
 import {
   View,
   Image,
   StyleSheet,
   useWindowDimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {useForm} from 'react-hook-form';
+import {Auth} from 'aws-amplify';
+
+// TYPES
+import {SignInNavigationProp} from '../../../types/navigation';
+
+// COMPONENTS
 import FormInput from '../components/FormInput';
 import CustomButton from '../components/CustomButton';
 import SocialSignInButtons from '../components/SocialSignInButtons';
-import {useNavigation} from '@react-navigation/native';
-import {useForm} from 'react-hook-form';
-import {SignInNavigationProp} from '../../../types/navigation';
 
-type SignInData = {
+type ISignInData = {
   username: string;
   password: string;
 };
@@ -23,10 +28,35 @@ const SignInScreen = () => {
   const {height} = useWindowDimensions();
   const navigation = useNavigation<SignInNavigationProp>();
 
-  const {control, handleSubmit} = useForm<SignInData>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSignInPressed = (data: SignInData) => {
-    console.log(data);
+  const {control, handleSubmit, reset} = useForm<ISignInData>();
+
+  const onSignInPressed = async ({username, password}: ISignInData) => {
+    if (isLoading) {
+      // if currently loading => return
+      return;
+    } else {
+      setIsLoading(true);
+    }
+
+    try {
+      const response = await Auth.signIn(username, password);
+      console.log(response);
+
+      // TODO:: save currentUser in context
+    } catch (e) {
+      // if account not yet confirmed to confirm email page
+      if ((e as Error).name === 'UserNotConfirmedException') {
+        navigation.navigate('Confirm email', {username});
+      } else {
+        Alert.alert('Oopsie!', (e as Error).message);
+      }
+    } finally {
+      setIsLoading(false);
+      reset();
+    }
+
     // validate user
     // navigation.navigate('Home');
   };
@@ -69,7 +99,10 @@ const SignInScreen = () => {
           }}
         />
 
-        <CustomButton text="Sign In" onPress={handleSubmit(onSignInPressed)} />
+        <CustomButton
+          text={isLoading ? 'Loading...' : 'Sign In'}
+          onPress={handleSubmit(onSignInPressed)}
+        />
 
         <CustomButton
           text="Forgot password?"
