@@ -32,7 +32,10 @@ export type SearchTopTabNavigatorParamsList = {
 };
 
 export type OtherUserProfileFromSearchNavigationProp =
-  MaterialTopTabNavigationProp<HomeStackNavigatorParamsList, 'Users'>;
+  MaterialTopTabNavigationProp<
+    HomeStackNavigatorParamsList,
+    'OtherUserProfile'
+  >;
 
 export type HomeStackNavigatorParamsList = {
   Feed: undefined;
