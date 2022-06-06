@@ -9,6 +9,8 @@ import {RootNavigatorParamList} from '../types/navigation';
 import TabNavigator from './BottomTabNavigator';
 import AuthStackNavigator from './AuthStackNavigator';
 import {CommentsScreen} from '../screens/Comments';
+import {useAuthContext} from '../contexts/AuthContext';
+import {ActivityIndicator, View} from 'react-native';
 
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 
@@ -34,26 +36,41 @@ const linkingConfig: LinkingOptions<RootNavigatorParamList> = {
 };
 
 const Navigation = () => {
+  const {currentUser} = useAuthContext();
+
+  if (currentUser === undefined) {
+    return (
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer linking={linkingConfig}>
-      <Stack.Navigator initialRouteName="Auth">
-        <Stack.Screen
-          name="Auth"
-          component={AuthStackNavigator}
-          options={{
-            headerShown: false,
-            headerTitleAlign: 'center',
-          }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={TabNavigator}
-          options={{
-            headerShown: false,
-            headerTitleAlign: 'center',
-          }}
-        />
-        <Stack.Screen name="Comments" component={CommentsScreen} />
+      <Stack.Navigator>
+        {!currentUser ? (
+          <Stack.Screen
+            name="Auth"
+            component={AuthStackNavigator}
+            options={{
+              headerShown: false,
+              headerTitleAlign: 'center',
+            }}
+          />
+        ) : (
+          <>
+            <Stack.Screen
+              name="Home"
+              component={TabNavigator}
+              options={{
+                headerShown: false,
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Stack.Screen name="Comments" component={CommentsScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

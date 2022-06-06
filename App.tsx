@@ -4,11 +4,16 @@ import {Amplify} from 'aws-amplify';
 // @ts-ignore
 // import {withAuthenticator} from 'aws-amplify-react-native';
 import config from './src/aws-exports';
+import {AuthContextProvider} from './src/contexts/AuthContext';
 
 Amplify.configure(config);
 
 const App = () => {
-  return <RootTabNavigator />;
+  return (
+    <AuthContextProvider>
+      <RootTabNavigator />
+    </AuthContextProvider>
+  );
 };
 
 // const signUpConfig = {

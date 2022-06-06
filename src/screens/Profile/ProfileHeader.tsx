@@ -3,7 +3,7 @@ import React, {memo} from 'react';
 import {Auth} from 'aws-amplify';
 
 // TYPES
-import {ProfileNavigationProp} from '../../navigation/types';
+import {ProfileNavigationProp} from '../../types/navigation';
 
 // COMPONENTS
 import {Button} from '../../components/Button';
@@ -17,9 +17,11 @@ import {useNavigation} from '@react-navigation/native';
 
 const ProfileHeader = () => {
   const navigation = useNavigation<ProfileNavigationProp>();
+
   const navigateToEditProfile = () => {
-    navigation.navigate('EditProfile');
+    navigation.navigate('Edit Profile');
   };
+
   return (
     <View style={styles.root}>
       <View style={styles.header}>
