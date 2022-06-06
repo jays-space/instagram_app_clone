@@ -1,4 +1,4 @@
-package com.instagram_app;
+package com.jays_space.photosphere;
 import expo.modules.ReactActivityDelegateWrapper;
 
 import com.facebook.react.ReactActivity;
@@ -15,7 +15,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "instagram_app";
+    return "JaysPhotoSphere";
   }
 
   /**
