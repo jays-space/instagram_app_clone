@@ -1,5 +1,6 @@
 import {View, Text, Image} from 'react-native';
 import React, {memo} from 'react';
+import {Auth} from 'aws-amplify';
 
 // TYPES
 import {ProfileNavigationProp} from '../../navigation/types';
@@ -51,10 +52,7 @@ const ProfileHeader = () => {
       {/* Tab buttons container  */}
       <View style={styles.tabButtons}>
         <Button title="Edit Profile" onPress={navigateToEditProfile} />
-        <Button
-          title="Another Button"
-          onPress={() => console.warn('another button pressed')}
-        />
+        <Button title="Sign Out" onPress={() => Auth.signOut()} />
       </View>
     </View>
   );

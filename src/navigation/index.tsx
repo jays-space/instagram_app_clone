@@ -3,15 +3,16 @@ import {LinkingOptions, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 // TYPES
-import {RootNavigatorParamsList} from './types';
+import {RootNavigatorParamList} from '../types/navigation';
 
 // SCREENS
 import TabNavigator from './BottomTabNavigator';
+import AuthStackNavigator from './AuthStackNavigator';
 import {CommentsScreen} from '../screens/Comments';
 
-const Stack = createNativeStackNavigator<RootNavigatorParamsList>();
+const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 
-const linkingConfig: LinkingOptions<RootNavigatorParamsList> = {
+const linkingConfig: LinkingOptions<RootNavigatorParamList> = {
   prefixes: ['jaysinsta://'],
   config: {
     initialRouteName: 'Home',
@@ -35,7 +36,15 @@ const linkingConfig: LinkingOptions<RootNavigatorParamsList> = {
 const Navigation = () => {
   return (
     <NavigationContainer linking={linkingConfig}>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Auth">
+        <Stack.Screen
+          name="Auth"
+          component={AuthStackNavigator}
+          options={{
+            headerShown: false,
+            headerTitleAlign: 'center',
+          }}
+        />
         <Stack.Screen
           name="Home"
           component={TabNavigator}
