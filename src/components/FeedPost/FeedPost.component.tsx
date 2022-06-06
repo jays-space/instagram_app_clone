@@ -17,6 +17,8 @@ import {VideoPlayer} from '../VideoPlayer';
 // STYLES
 import {styles} from './FeedPost.styles';
 import {colors} from '../../theme/colors';
+import {useNavigation} from '@react-navigation/native';
+import {FeedNavigationProp} from '../../navigation/types';
 
 interface IFeedPost {
   post: IPost;
@@ -24,6 +26,8 @@ interface IFeedPost {
 }
 
 const FeedPost = ({post, isViewable = null}: IFeedPost) => {
+  const navigation = useNavigation<FeedNavigationProp>();
+
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(false);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(false);
@@ -32,6 +36,20 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
     setIsDescriptionExpanded(value => !value); //? Updating local state in 'real-time' and not async 3.5 State for Likes @ 15:00
 
   const togglePostLike = () => setIsPostLiked(value => !value);
+
+  const navigateToProfile = () => {
+    navigation.navigate('OtherUserProfile', {
+      userID: post.user?.id, //* if no userID, send currentUserID instead
+      username: post.user?.username,
+    });
+  };
+
+  const navigateToComments = () => {
+    navigation.navigate('Comments', {
+      screen: 'Comments',
+      postID: post.id,
+    });
+  };
 
   let content = null;
   if (post.image) {
@@ -70,7 +88,9 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         />
 
         {/* currentUser name */}
-        <Text style={styles.userName}>{post?.user?.username}</Text>
+        <Pressable onPress={navigateToProfile}>
+          <Text style={styles.userName}>{post?.user?.username}</Text>
+        </Pressable>
 
         {/* more options icon */}
         <Entypo
@@ -136,7 +156,9 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         </Text>
 
         {/* comments */}
-        <Text>View all {post?.nofComments.toString()} comments</Text>
+        <Text onPress={navigateToComments}>
+          View all {post?.nofComments.toString()} comments
+        </Text>
         {post?.comments?.map(comment => {
           return <Comment key={comment?.id} comment={comment} />;
         })}
