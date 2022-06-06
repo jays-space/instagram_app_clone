@@ -11,9 +11,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import {Auth} from 'aws-amplify';
 
-// CONTEXTS
-import {useAuthContext} from '../../../contexts/AuthContext';
-
 // TYPES
 import {SignInNavigationProp} from '../../../types/navigation';
 
@@ -33,7 +30,6 @@ type ISignInData = {
 const SignInScreen = () => {
   const {height} = useWindowDimensions();
   const navigation = useNavigation<SignInNavigationProp>();
-  const {setCurrentUser} = useAuthContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,10 +44,7 @@ const SignInScreen = () => {
     }
 
     try {
-      const cognitoUser = await Auth.signIn(email, password);
-
-      //* save currentUser in context
-      setCurrentUser({...cognitoUser});
+      await Auth.signIn(email, password);
     } catch (e) {
       // if account not yet confirmed to confirm email page
       if ((e as Error).name === 'UserNotConfirmedException') {
