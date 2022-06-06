@@ -22,8 +22,11 @@ import FormInput from '../components/FormInput';
 import CustomButton from '../components/CustomButton';
 import SocialSignInButtons from '../components/SocialSignInButtons';
 
+const EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
 type ISignInData = {
-  username: string;
+  email: string;
   password: string;
 };
 
@@ -36,7 +39,7 @@ const SignInScreen = () => {
 
   const {control, handleSubmit, reset} = useForm<ISignInData>();
 
-  const onSignInPressed = async ({username, password}: ISignInData) => {
+  const onSignInPressed = async ({email, password}: ISignInData) => {
     if (isLoading) {
       // if currently loading => return
       return;
@@ -45,14 +48,14 @@ const SignInScreen = () => {
     }
 
     try {
-      const cognitoUser = await Auth.signIn(username, password);
+      const cognitoUser = await Auth.signIn(email, password);
 
       //* save currentUser in context
       setCurrentUser({...cognitoUser});
     } catch (e) {
       // if account not yet confirmed to confirm email page
       if ((e as Error).name === 'UserNotConfirmedException') {
-        navigation.navigate('Confirm email', {username});
+        navigation.navigate('Confirm email', {email});
       } else {
         Alert.alert('Oopsie!', (e as Error).message);
       }
@@ -83,10 +86,13 @@ const SignInScreen = () => {
         />
 
         <FormInput
-          name="username"
-          placeholder="Username"
+          name="email"
+          placeholder="Email"
           control={control}
-          rules={{required: 'Username is required'}}
+          rules={{
+            required: 'Email is required',
+            pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
+          }}
         />
 
         <FormInput

@@ -18,12 +18,9 @@ import {colors} from '../../../theme/colors';
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-const USERNAME_REGEX = /^[a-zA-Z0-9_]*$/; // alphanumeric and underscore
-
 type SignUpData = {
   name: string;
   email: string;
-  username: string;
   password: string;
   passwordRepeat: string;
 };
@@ -35,12 +32,7 @@ const SignUpScreen = () => {
 
   const pwd = watch('password');
 
-  const onRegisterPressed = async ({
-    name,
-    email,
-    username,
-    password,
-  }: SignUpData) => {
+  const onRegisterPressed = async ({name, email, password}: SignUpData) => {
     if (isLoading) {
       return;
     } else {
@@ -54,10 +46,10 @@ const SignUpScreen = () => {
     };
 
     try {
-      Auth.signUp({username, password, attributes});
+      Auth.signUp({username: email, password, attributes});
 
       // to confirm email page
-      navigation.navigate('Confirm email', {username});
+      navigation.navigate('Confirm email', {email});
     } catch (e) {
       Alert.alert('Oopsie!', (e as Error).message);
     } finally {
@@ -99,26 +91,6 @@ const SignUpScreen = () => {
           }}
         />
 
-        <FormInput
-          name="username"
-          control={control}
-          placeholder="Username"
-          rules={{
-            required: 'Username is required',
-            minLength: {
-              value: 3,
-              message: 'Username should be at least 3 characters long',
-            },
-            maxLength: {
-              value: 24,
-              message: 'Username should be max 24 characters long',
-            },
-            pattern: {
-              value: USERNAME_REGEX,
-              message: 'Username can only contain a-z, 0-9, _',
-            },
-          }}
-        />
         <FormInput
           name="email"
           control={control}

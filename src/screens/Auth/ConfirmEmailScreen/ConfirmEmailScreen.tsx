@@ -16,8 +16,11 @@ import FormInput from '../components/FormInput';
 import CustomButton from '../components/CustomButton';
 // import SocialSignInButtons from '../components/SocialSignInButtons';
 
+const EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
 type ConfirmEmailData = {
-  username: string;
+  email: string;
   code: string;
 };
 
@@ -26,14 +29,14 @@ const ConfirmEmailScreen = () => {
   const navigation = useNavigation<ConfirmEmailNavigationProp>();
 
   const {control, handleSubmit, watch} = useForm<ConfirmEmailData>({
-    defaultValues: {username: route.params.username},
+    defaultValues: {email: route.params.email},
   });
 
-  const usr = watch('username'); // store value of field in variable
+  const em = watch('email'); // store value of field in variable
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const onConfirmPressed = async ({code, username}: ConfirmEmailData) => {
+  const onConfirmPressed = async ({code, email}: ConfirmEmailData) => {
     if (isLoading) {
       return;
     } else {
@@ -41,7 +44,7 @@ const ConfirmEmailScreen = () => {
     }
 
     try {
-      await Auth.confirmSignUp(username, code);
+      await Auth.confirmSignUp(email, code);
       navigation.navigate('Sign in');
     } catch (e) {
       Alert.alert('Oopsie!', (e as Error).message);
@@ -56,7 +59,7 @@ const ConfirmEmailScreen = () => {
 
   const onResendPress = async () => {
     try {
-      await Auth.resendSignUp(usr);
+      await Auth.resendSignUp(em);
       Alert.alert('Check your email', 'The code has been sent');
     } catch (e) {
       Alert.alert('Oopsie!', (e as Error).message);
@@ -69,11 +72,12 @@ const ConfirmEmailScreen = () => {
         <Text style={styles.title}>Confirm your email</Text>
 
         <FormInput
-          name="username"
+          name="email"
           control={control}
-          placeholder="Username"
+          placeholder="Email"
           rules={{
-            required: 'Username is required',
+            required: 'Email is required',
+            pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
           }}
         />
 

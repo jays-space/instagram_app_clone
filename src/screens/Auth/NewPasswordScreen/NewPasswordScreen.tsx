@@ -12,8 +12,11 @@ import FormInput from '../components/FormInput';
 import CustomButton from '../components/CustomButton';
 // import SocialSignInButtons from '../components/SocialSignInButtons';
 
+const EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
 type NewPasswordType = {
-  username: string;
+  email: string;
   code: string;
   password: string;
 };
@@ -25,11 +28,7 @@ const NewPasswordScreen = () => {
 
   const navigation = useNavigation<NewPasswordNavigationProp>();
 
-  const onSubmitPressed = async ({
-    code,
-    password,
-    username,
-  }: NewPasswordType) => {
+  const onSubmitPressed = async ({code, password, email}: NewPasswordType) => {
     if (isLoading) {
       // if currently loading => return
       return;
@@ -38,7 +37,7 @@ const NewPasswordScreen = () => {
     }
 
     try {
-      await Auth.forgotPasswordSubmit(username, code, password);
+      await Auth.forgotPasswordSubmit(email, code, password);
 
       navigation.navigate('Sign in');
     } catch (e) {
@@ -58,10 +57,13 @@ const NewPasswordScreen = () => {
         <Text style={styles.title}>Reset your password</Text>
 
         <FormInput
-          placeholder="Username"
-          name="username"
+          placeholder="email"
+          name="email"
           control={control}
-          rules={{required: 'Username is required'}}
+          rules={{
+            required: 'Email is required',
+            pattern: {value: EMAIL_REGEX, message: 'Email is invalid'},
+          }}
         />
 
         <FormInput
