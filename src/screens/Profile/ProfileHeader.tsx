@@ -53,8 +53,8 @@ const ProfileHeader = () => {
 
       {/* Tab buttons container  */}
       <View style={styles.tabButtons}>
-        <Button title="Edit Profile" onPress={navigateToEditProfile} />
-        <Button title="Sign Out" onPress={() => Auth.signOut()} />
+        <Button title="Edit Profile" inline onPress={navigateToEditProfile} />
+        <Button title="Sign Out" inline onPress={() => Auth.signOut()} />
       </View>
     </View>
   );

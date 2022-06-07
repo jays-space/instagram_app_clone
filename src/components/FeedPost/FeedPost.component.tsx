@@ -4,24 +4,25 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
+import {useNavigation} from '@react-navigation/native';
 
 // TYPES
-import {IPost} from '../../types/models';
+import {Post as PostType} from '../../API';
+import {FeedNavigationProp} from '../../types/navigation';
 
 // COMPONENTS
 import {Comment} from '../Comment';
 import {DoublePressable} from '../DoublePressable';
 import {Carousel} from '../Carousel';
 import {VideoPlayer} from '../VideoPlayer';
+import {DEFAULT_USER_IMAGE} from '../../config';
 
 // STYLES
 import {styles} from './FeedPost.styles';
 import {colors} from '../../theme/colors';
-import {useNavigation} from '@react-navigation/native';
-import {FeedNavigationProp} from '../../navigation/types';
 
 interface IFeedPost {
-  post: IPost;
+  post: PostType;
   isViewable?: boolean | null;
 }
 
@@ -38,16 +39,17 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
   const togglePostLike = () => setIsPostLiked(value => !value);
 
   const navigateToProfile = () => {
-    navigation.navigate('OtherUserProfile', {
-      userID: post.user?.id, //* if no userID, send currentUserID instead
-      username: post.user?.username,
-    });
+    if (post?.User) {
+      navigation.navigate('UserProfile', {
+        userId: post.User?.id, //* if no userID, send currentUserID instead
+      });
+    }
   };
 
   const navigateToComments = () => {
     navigation.navigate('Comments', {
       screen: 'Comments',
-      postID: post.id,
+      postId: post.id,
     });
   };
 
@@ -81,7 +83,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         {/* currentUser avatar */}
         <Image
           source={{
-            uri: post?.user?.image,
+            uri: post?.User?.image || DEFAULT_USER_IMAGE,
           }}
           resizeMode="contain"
           style={styles.userAvatar}
@@ -89,7 +91,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
 
         {/* currentUser name */}
         <Pressable onPress={navigateToProfile}>
-          <Text style={styles.userName}>{post?.user?.username}</Text>
+          <Text style={styles.userName}>{post?.User?.username}</Text>
         </Pressable>
 
         {/* more options icon */}
@@ -138,9 +140,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
 
         {/* likes */}
         <Text style={styles.text}>
-          Liked by{' '}
-          <Text style={styles.bold}>{post?.comments[0]?.user?.username}</Text>{' '}
-          and{' '}
+          Liked by <Text style={styles.bold}>{post?.User?.username}</Text> and{' '}
           <Text style={styles.bold}>
             {(post?.nofLikes - 1).toString()} others
           </Text>
@@ -159,7 +159,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         <Text onPress={navigateToComments}>
           View all {post?.nofComments.toString()} comments
         </Text>
-        {post?.comments?.map(comment => {
+        {(post?.Comments?.items || []).map(comment => {
           return <Comment key={comment?.id} comment={comment} />;
         })}
 

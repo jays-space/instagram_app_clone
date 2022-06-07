@@ -29,6 +29,8 @@ export type MyProfileRouteProp = RouteProp<
 export type HomeStackNavigatorParamList = {
   Feed: undefined;
   UserProfile: {userId: string};
+  UpdatePost: {id: string};
+  PostLikes: {id: string};
 };
 
 export type UserProfileNavigationProp = NativeStackNavigationProp<

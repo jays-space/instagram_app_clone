@@ -1,15 +1,29 @@
 import React, {memo, useRef, useState} from 'react';
-import {FlatList, ViewabilityConfig, ViewToken} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  ViewabilityConfig,
+  ViewToken,
+} from 'react-native';
+import {useQuery} from '@apollo/client';
+
+// TYPES
+import {ListPostsQuery, ListPostsQueryVariables} from '../../API';
+
+// QUERIES
+import {listPosts} from './queries';
 
 // COMPONENTS
 import {FeedPost} from '../../components/FeedPost';
-
-// MOCK
-import {POSTS} from '../../mock/post';
+import {ApiErrorMessage} from '../../components/ApiErrorMessage';
 
 const HomeScreen = () => {
-  // const [activePostId, setActivePOstId] = useState<string | null>(null);
   const [viewableItemIndex, setViewableItemIndex] = useState<number>(0);
+
+  const {data, loading, error} = useQuery<
+    ListPostsQuery,
+    ListPostsQueryVariables
+  >(listPosts);
 
   const viewabilityConfig: ViewabilityConfig = {
     itemVisiblePercentThreshold: 51,
@@ -24,17 +38,31 @@ const HomeScreen = () => {
     },
   );
 
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return (
+      <ApiErrorMessage title="error fetching posts" message={error.message} />
+    );
+  }
+
+  const POSTS = data?.listPosts?.items || [];
+
   return (
     <FlatList
       data={POSTS}
-      keyExtractor={item => item.id}
-      renderItem={({item: post, index: fIndex}) => (
-        <FeedPost
-          key={post.id}
-          post={post}
-          isViewable={viewableItemIndex === fIndex} // is post visible
-        />
-      )}
+      keyExtractor={item => (item ? item?.id : '')}
+      renderItem={({item: post, index: fIndex}) =>
+        post && (
+          <FeedPost
+            key={post?.id}
+            post={post}
+            isViewable={viewableItemIndex === fIndex} // is post visible
+          />
+        )
+      }
       showsVerticalScrollIndicator={false}
       onViewableItemsChanged={onViewableItemsChanged.current}
       viewabilityConfig={viewabilityConfig}
