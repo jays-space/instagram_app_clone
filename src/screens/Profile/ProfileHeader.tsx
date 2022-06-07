@@ -1,8 +1,9 @@
 import {View, Text, Image} from 'react-native';
 import React, {memo} from 'react';
+import {Auth} from 'aws-amplify';
 
 // TYPES
-import {ProfileNavigationProp} from '../../navigation/types';
+import {ProfileNavigationProp} from '../../types/navigation';
 
 // COMPONENTS
 import {Button} from '../../components/Button';
@@ -16,9 +17,11 @@ import {useNavigation} from '@react-navigation/native';
 
 const ProfileHeader = () => {
   const navigation = useNavigation<ProfileNavigationProp>();
+
   const navigateToEditProfile = () => {
-    navigation.navigate('EditProfile');
+    navigation.navigate('Edit Profile');
   };
+
   return (
     <View style={styles.root}>
       <View style={styles.header}>
@@ -51,10 +54,7 @@ const ProfileHeader = () => {
       {/* Tab buttons container  */}
       <View style={styles.tabButtons}>
         <Button title="Edit Profile" onPress={navigateToEditProfile} />
-        <Button
-          title="Another Button"
-          onPress={() => console.warn('another button pressed')}
-        />
+        <Button title="Sign Out" onPress={() => Auth.signOut()} />
       </View>
     </View>
   );

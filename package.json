@@ -1,5 +1,5 @@
 {
-  "name": "instagram_app",
+  "name": "JaysPhotoSphere",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,17 +10,25 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.6",
+    "@react-native-community/netinfo": "^9.0.0",
+    "@react-native-picker/picker": "^2.4.1",
     "@react-navigation/bottom-tabs": "^6.3.1",
     "@react-navigation/material-top-tabs": "^6.2.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.2",
     "@types/react-native-vector-icons": "^6.4.10",
+    "amazon-cognito-identity-js": "^5.2.9",
+    "aws-amplify": "^4.3.24",
+    "aws-amplify-react-native": "^6.0.4",
     "expo": "^45.0.0",
     "expo-camera": "~12.2.0",
+    "graphql": "^14.7.0",
     "react": "17.0.2",
     "react-hook-form": "^7.31.1",
     "react-native": "0.68.2",
     "react-native-image-picker": "^4.8.3",
+    "react-native-inappbrowser-reborn": "^3.6.3",
     "react-native-pager-view": "^5.4.15",
     "react-native-safe-area-context": "^4.2.5",
     "react-native-screens": "^3.13.1",
