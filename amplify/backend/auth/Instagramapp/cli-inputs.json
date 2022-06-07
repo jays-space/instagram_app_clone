@@ -62,7 +62,17 @@
       ]
     },
     "breakCircularDependency": true,
-    "dependsOn": [],
+    "dependsOn": [
+      {
+        "category": "function",
+        "resourceName": "InstagramappPostConfirmation",
+        "triggerProvider": "Cognito",
+        "attributes": [
+          "Arn",
+          "Name"
+        ]
+      }
+    ],
     "hostedUI": true,
     "hostedUIDomainName": "3jbfh07sd3xm",
     "authProvidersUserPool": [
@@ -70,6 +80,16 @@
       "Google"
     ],
     "hostedUIProviderMeta": "[{\"ProviderName\":\"Facebook\",\"authorize_scopes\":\"public_profile\",\"AttributeMapping\":{\"name\":\"name\",\"username\":\"id\"}},{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid profile\",\"AttributeMapping\":{\"name\":\"name\",\"username\":\"sub\"}}]",
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"jaysinsta://\"],\"LogoutURLs\":[\"jaysinsta://\"]}"
+    "triggers": {
+      "PostConfirmation": [
+        "custom"
+      ]
+    },
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"jaysinsta://\"],\"LogoutURLs\":[\"jaysinsta://\"]}",
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PostConfirmation\",\n    \"lambdaFunctionName\": \"InstagramappPostConfirmation\"\n  }\n]",
+    "permissions": []
   }
 }

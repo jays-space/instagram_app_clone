@@ -11,5 +11,13 @@ export type AmplifyDependentResourcesAttributes = {
             "AppClientIDWeb": "string",
             "AppClientID": "string"
         }
+    },
+    "function": {
+        "InstagramappPostConfirmation": {
+            "Name": "string",
+            "Arn": "string",
+            "LambdaExecutionRole": "string",
+            "Region": "string"
+        }
     }
 }
