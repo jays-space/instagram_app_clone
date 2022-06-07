@@ -7,6 +7,7 @@ import {Amplify} from 'aws-amplify';
 import config from './src/aws-exports';
 import {AuthContextProvider} from './src/contexts/AuthContext';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import {Client} from './src/apollo/Client';
 
 const urlOpener = async (url: string, redirectUrl: string) => {
   await InAppBrowser.isAvailable();
@@ -35,7 +36,9 @@ Amplify.configure(updatedConfig);
 const App = () => {
   return (
     <AuthContextProvider>
-      <RootTabNavigator />
+      <Client>
+        <RootTabNavigator />
+      </Client>
     </AuthContextProvider>
   );
 };

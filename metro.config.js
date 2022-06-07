@@ -4,6 +4,7 @@
  *
  * @format
  */
+const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 module.exports = {
   transformer: {
@@ -13,5 +14,8 @@ module.exports = {
         inlineRequires: true,
       },
     }),
+  },
+  resolver: {
+    blacklistRE: exclusionList([/#current-cloud-backend\/.*/]),
   },
 };
