@@ -25,6 +25,7 @@ export const listPosts = gql`
           id
           name
           username
+          image
         }
       }
       nextToken

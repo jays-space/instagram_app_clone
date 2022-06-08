@@ -48,7 +48,6 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
 
   const navigateToComments = () => {
     navigation.navigate('Comments', {
-      screen: 'Comments',
       postId: post.id,
     });
   };
@@ -66,9 +65,9 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         />
       </DoublePressable>
     );
-  } else if (post.images) {
+  } else if (post?.images && post?.images?.length > 0) {
     content = <Carousel images={post.images} onDoublePress={togglePostLike} />;
-  } else if (post.video) {
+  } else if (post?.video) {
     content = (
       <DoublePressable onDoublePress={togglePostLike}>
         <VideoPlayer video={post.video} paused={!isViewable} />

@@ -1,10 +1,14 @@
-import {FlatList, StyleSheet} from 'react-native';
 import React from 'react';
-import {IPost} from '../../types/models';
+import {FlatList, StyleSheet} from 'react-native';
+
+// TYPES
+import {Post} from '../../API';
+
+// COMPONENTS
 import FeedGridItem from './FeedGridItem.component';
 
 interface IFeedGridView {
-  data: IPost[];
+  data: (Post | null)[];
   ListHeaderComponent?:
     | React.ComponentType<any>
     | React.ReactElement
@@ -16,8 +20,8 @@ const FeedGridView = ({data, ListHeaderComponent}: IFeedGridView) => {
   return (
     <FlatList
       data={data}
-      keyExtractor={item => item.id}
-      renderItem={({item: post}) => <FeedGridItem post={post} />}
+      keyExtractor={item => (item ? item.id : '')}
+      renderItem={({item: post}) => post && <FeedGridItem post={post} />}
       numColumns={3}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.container}

@@ -10,7 +10,7 @@ import {useQuery} from '@apollo/client';
 // TYPES
 import {ListPostsQuery, ListPostsQueryVariables} from '../../API';
 
-// QUERIES
+// GQL
 import {listPosts} from './queries';
 
 // COMPONENTS

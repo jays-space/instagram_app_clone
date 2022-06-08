@@ -1,21 +1,24 @@
 import {View, Text, Image} from 'react-native';
 import React, {memo} from 'react';
 import {Auth} from 'aws-amplify';
+import {useNavigation} from '@react-navigation/native';
 
 // TYPES
 import {ProfileNavigationProp} from '../../types/navigation';
+import {User} from '../../API';
 
 // COMPONENTS
 import {Button} from '../../components/Button';
 
 // STYLES
 import {styles} from './ProfileScreen.styles';
+import {DEFAULT_USER_IMAGE} from '../../config';
 
-// MOCK
-import user from '../../mock/user.json';
-import {useNavigation} from '@react-navigation/native';
+interface IProfileHeader {
+  user: User;
+}
 
-const ProfileHeader = () => {
+const ProfileHeader = ({user}: IProfileHeader) => {
   const navigation = useNavigation<ProfileNavigationProp>();
 
   const navigateToEditProfile = () => {
@@ -26,20 +29,23 @@ const ProfileHeader = () => {
     <View style={styles.root}>
       <View style={styles.header}>
         {/* Profile Image */}
-        <Image source={{uri: user.image}} style={styles.userImage} />
+        <Image
+          source={{uri: user?.image || DEFAULT_USER_IMAGE}}
+          style={styles.userImage}
+        />
 
         {/* Posts, followers, following number */}
         <View style={styles.statsContainer}>
           <View style={styles.stat}>
-            <Text style={styles.statValue}>98</Text>
+            <Text style={styles.statValue}>{user?.nofPosts}</Text>
             <Text>Posts</Text>
           </View>
           <View style={styles.stat}>
-            <Text style={styles.statValue}>198</Text>
+            <Text style={styles.statValue}>{user?.nofFollowers}</Text>
             <Text>Followers</Text>
           </View>
           <View style={styles.stat}>
-            <Text style={styles.statValue}>298</Text>
+            <Text style={styles.statValue}>{user?.nofFollowings}</Text>
             <Text>Following</Text>
           </View>
         </View>
@@ -47,8 +53,8 @@ const ProfileHeader = () => {
 
       {/* About user */}
       <View>
-        <Text style={styles.username}>{user.name}</Text>
-        <Text>{user.bio}</Text>
+        <Text style={styles.username}>{user?.name}</Text>
+        <Text>{user?.bio}</Text>
       </View>
 
       {/* Tab buttons container  */}

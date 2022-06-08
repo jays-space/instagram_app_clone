@@ -3,13 +3,13 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Image, StyleSheet} from 'react-native';
 
 // TYPES
-import {HomeStackNavigatorParamsList} from './types';
+import {HomeStackNavigatorParamList} from '../types/navigation';
 
 // SCREENS
 import {HomeScreen} from '../screens/Home';
 import {ProfileScreen} from '../screens/Profile';
 
-const Stack = createNativeStackNavigator<HomeStackNavigatorParamsList>();
+const Stack = createNativeStackNavigator<HomeStackNavigatorParamList>();
 
 const HomeStackNavigator = () => {
   return (
@@ -22,7 +22,7 @@ const HomeStackNavigator = () => {
         options={{headerTitle: HeaderTitle, headerTitleAlign: 'center'}}
       />
       <Stack.Screen
-        name="OtherUserProfile"
+        name="UserProfile"
         component={ProfileScreen}
         options={{title: 'Other User Profile'}}
       />

@@ -5,7 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 // TYPES
-import {BottomTabNavigatorParamsList} from './types';
+import {BottomTabNavigatorParamList} from '../types/navigation';
 
 // NAVIGATORS
 import HomeStackNavigator from './HomeStackNavigator';
@@ -16,7 +16,7 @@ import SearchTabNavigator from './SearchTabNavigator';
 // STYLES
 import {colors} from '../theme/colors';
 
-const Tab = createBottomTabNavigator<BottomTabNavigatorParamsList>();
+const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 
 const TabNavigator = () => {
   return (
@@ -74,7 +74,7 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="CurrentUserProfile"
+        name="MyProfile"
         component={ProfileStackNavigator}
         options={{
           headerShown: false,

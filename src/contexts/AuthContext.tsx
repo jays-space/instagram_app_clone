@@ -13,10 +13,12 @@ type CurrentUserType = CognitoUser | null | undefined;
 
 type AuthContextType = {
   currentUser: CurrentUserType;
+  currentUserId: string;
 };
 
 const AuthContext = createContext<AuthContextType>({
   currentUser: undefined,
+  currentUserId: '',
 });
 
 export const AuthContextProvider = ({children}: {children: ReactNode}) => {
@@ -54,7 +56,8 @@ export const AuthContextProvider = ({children}: {children: ReactNode}) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{currentUser}}>
+    <AuthContext.Provider
+      value={{currentUser, currentUserId: currentUser?.attributes?.sub}}>
       {children}
     </AuthContext.Provider>
   );

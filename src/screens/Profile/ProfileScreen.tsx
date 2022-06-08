@@ -1,39 +1,66 @@
 import React from 'react';
-import {SafeAreaView} from 'react-native';
+import {ActivityIndicator, SafeAreaView} from 'react-native';
 import {useRoute, useNavigation} from '@react-navigation/native';
+import {useQuery} from '@apollo/client';
+
+// CONTEXTS
+import {useAuthContext} from '../../contexts/AuthContext';
+
+// GQL
+import {getUser} from './queries';
+import {GetUserQuery, GetUserQueryVariables} from '../../API';
 
 // TYPES
 import {
-  CurrentUserProfileNavigationProp,
-  CurrentUserProfileRouteProp,
-  OtherUserProfileNavigationProp,
-  OtherUserProfileRouteProp,
-} from '../../navigation/types';
+  MyProfileNavigationProp,
+  MyProfileRouteProp,
+  UserProfileNavigationProp,
+  UserProfileRouteProp,
+} from '../../types/navigation';
 
 // COMPONENTS
 import ProfileHeader from './ProfileHeader';
 import {FeedGridView} from '../../components/FeedGridView';
-
-// MOCK
-import user from '../../mock/user.json';
+import {ApiErrorMessage} from '../../components/ApiErrorMessage';
 
 const ProfileScreen = () => {
   const navigation = useNavigation<
-    CurrentUserProfileNavigationProp | OtherUserProfileNavigationProp
+    MyProfileNavigationProp | UserProfileNavigationProp
   >();
-
-  const {params} = useRoute<
-    CurrentUserProfileRouteProp | OtherUserProfileRouteProp
-  >();
-
-  // const {userID, username} = params; // query the user with userID
-
+  const {params} = useRoute<MyProfileRouteProp | UserProfileRouteProp>();
   // navigation.setOptions({title: username}); //* change screen title
+
+  // query the user with userID
+  const userId = params?.userId;
+
+  const {currentUserId} = useAuthContext();
+
+  const {data, loading, error} = useQuery<GetUserQuery, GetUserQueryVariables>(
+    getUser,
+    {variables: {id: userId || currentUserId}},
+  );
+  const user = data?.getUser;
+
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error || !user) {
+    return (
+      <ApiErrorMessage
+        title="Error fetching the user profile"
+        message={error?.message || 'User not found'}
+      />
+    );
+  }
 
   return (
     //   GridView Posts
     <SafeAreaView>
-      <FeedGridView data={user?.posts} ListHeaderComponent={ProfileHeader} />
+      <FeedGridView
+        data={user?.Posts?.items || []}
+        ListHeaderComponent={() => <ProfileHeader user={user} />}
+      />
     </SafeAreaView>
   );
 };

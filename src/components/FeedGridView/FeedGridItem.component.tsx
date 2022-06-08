@@ -3,13 +3,14 @@ import {Dimensions, Image, StyleSheet, View} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 // TYPES
-import {IPost} from '../../types/models';
+
+import {Post} from '../../API';
 
 // STYLES
 import {colors} from '../../theme/colors';
 
 const {width} = Dimensions.get('window');
-const FeedGridItem = ({post}: {post: IPost}) => {
+const FeedGridItem = ({post}: {post: Post}) => {
   return (
     <View style={styles.root}>
       <Image
