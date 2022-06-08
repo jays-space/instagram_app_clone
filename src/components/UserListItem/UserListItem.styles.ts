@@ -15,6 +15,9 @@ export const styles = StyleSheet.create({
 
     marginRight: 10,
   },
+  textContainer: {
+    flexDirection: 'column',
+  },
   name: {
     fontWeight: fonts.weight.bold,
   },

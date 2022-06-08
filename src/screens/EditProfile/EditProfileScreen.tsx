@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   StyleSheet,
@@ -7,18 +8,33 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {useMutation, useQuery} from '@apollo/client';
 import {useForm, Control, Controller} from 'react-hook-form';
 import * as ImagePicker from 'react-native-image-picker';
 
+// CONTEXTS
+import {useAuthContext} from '../../contexts/AuthContext';
+
 // TYPES
-import {User} from '../../API';
+import {
+  GetUserQuery,
+  GetUserQueryVariables,
+  UpdateUserMutation,
+  UpdateUserMutationVariables,
+  User,
+} from '../../API';
+
+// GQL
+import {getUser, updateUser} from './queries';
+
+// COMPONENTS
+import {ApiErrorMessage} from '../../components/ApiErrorMessage';
 
 // STYLES
 import {colors} from '../../theme/colors';
 import fonts from '../../theme/fonts';
-
-// MOCK
-import user from '../../mock/user.json';
+import {DEFAULT_USER_IMAGE} from '../../config';
 
 //* Creates a new type based on another type.
 //* However, Pick enables us to select specific keys we'd like to pass into the new type.
@@ -86,16 +102,51 @@ const CustomInput = ({
 );
 
 const EditProfileScreen = () => {
+  const navigation = useNavigation();
+
+  const {currentUserId} = useAuthContext();
   const [selectedPhoto, setSelectedPhoto] = useState<ImagePicker.Asset | null>(
     null,
   );
+  const {control, handleSubmit, setValue} = useForm<IEditableUser>();
 
-  const {control, handleSubmit} = useForm<IEditableUser>({
-    defaultValues: {name: user.name, username: user.username, bio: user.bio},
-  });
+  const {data, loading, error} = useQuery<GetUserQuery, GetUserQueryVariables>(
+    getUser,
+    {variables: {id: currentUserId}},
+  );
 
-  const onSubmit = (data: IEditableUser) => {
-    console.log('submit: ', data);
+  const [onUpdateUserStart, {loading: updateLoading, error: updateError}] =
+    useMutation<UpdateUserMutation, UpdateUserMutationVariables>(updateUser); // CRUD 39:40
+
+  const user = data?.getUser;
+
+  useEffect(() => {
+    if (user) {
+      setValue('name', user?.name);
+      setValue('username', user?.username);
+      setValue('website', user?.website);
+      setValue('bio', user?.bio);
+    }
+  }, [user, setValue]);
+
+  // const {control, handleSubmit} = useForm<IEditableUser>({
+  //   defaultValues: {
+  //     name: user?.name,
+  //     username: user?.username,
+  //     website: user?.website,
+  //     bio: user?.bio,
+  //   },
+  // });
+
+  const onSubmit = async (formData: IEditableUser) => {
+    if (!user) {
+      return;
+    }
+    await onUpdateUserStart({
+      variables: {input: {id: user?.id, ...formData, _version: user?._version}},
+    });
+
+    navigation.goBack();
   };
 
   const onChangePhoto = () => {
@@ -110,10 +161,31 @@ const EditProfileScreen = () => {
     );
   };
 
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return (
+      <ApiErrorMessage title="Could not get user" message={error.message} />
+    );
+  }
+
+  if (updateError) {
+    return (
+      <ApiErrorMessage
+        title="Could not update user"
+        message={updateError.message}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.root}>
       <Image
-        source={{uri: selectedPhoto?.uri ?? user.image}}
+        source={{
+          uri: selectedPhoto?.uri ?? (user?.image || DEFAULT_USER_IMAGE),
+        }}
         style={styles.avatar}
       />
       <Text onPress={onChangePhoto} style={styles.button}>
@@ -162,7 +234,7 @@ const EditProfileScreen = () => {
       />
 
       <Text onPress={handleSubmit(onSubmit)} style={styles.button}>
-        Submit
+        {updateLoading ? 'Submitting...' : 'Submit'}
       </Text>
     </SafeAreaView>
   );
@@ -200,5 +272,7 @@ const styles = StyleSheet.create({
   input: {
     borderBottomWidth: 1,
     // borderColor: colors.border,
+
+    minHeight: 50,
   },
 });

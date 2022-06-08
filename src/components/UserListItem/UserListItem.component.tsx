@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
-import {Text, Image, Pressable} from 'react-native';
+import {Text, Image, Pressable, View} from 'react-native';
 
 // TYPES
 import {User} from '../../API';
@@ -10,15 +10,30 @@ import {FeedNavigationProp} from '../../types/navigation';
 import {styles} from './UserListItem.styles';
 import {DEFAULT_USER_IMAGE} from '../../config';
 
+type IUserField =
+  | 'id'
+  | 'name'
+  | 'username'
+  | 'image'
+  | 'createdAt'
+  | 'updatedAt'
+  | '_version'
+  | '_deleted'
+  | '_lastChangedAt';
+type IUser = Pick<User, IUserField>;
+
 interface IUserListItem {
-  user: User;
+  user: IUser;
 }
 
 const UserListItem = ({user}: IUserListItem) => {
   const navigation = useNavigation<FeedNavigationProp>();
 
   const navigateToUserScreen = () => {
-    navigation.navigate('UserProfile', {userId: user.id});
+    if (!user) {
+      return;
+    }
+    navigation.navigate('UserProfile', {userId: user?.id});
   };
 
   return (
@@ -27,8 +42,10 @@ const UserListItem = ({user}: IUserListItem) => {
         source={{uri: user?.image || DEFAULT_USER_IMAGE}}
         style={styles.avatar}
       />
-      <Text style={styles.name}>{user.username}</Text>
-      <Text style={styles.username}>{user.username}</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.name}>{user?.name}</Text>
+        <Text style={styles.username}>{user?.username}</Text>
+      </View>
     </Pressable>
   );
 };
