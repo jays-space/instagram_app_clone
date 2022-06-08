@@ -14,9 +14,16 @@ interface IFeedGridView {
     | React.ReactElement
     | null
     | undefined;
+  loading: boolean;
+  refetch: () => void;
 }
 
-const FeedGridView = ({data, ListHeaderComponent}: IFeedGridView) => {
+const FeedGridView = ({
+  data,
+  ListHeaderComponent,
+  loading,
+  refetch,
+}: IFeedGridView) => {
   return (
     <FlatList
       data={data}
@@ -26,6 +33,8 @@ const FeedGridView = ({data, ListHeaderComponent}: IFeedGridView) => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.container}
       ListHeaderComponent={ListHeaderComponent}
+      refreshing={loading}
+      onRefresh={refetch}
     />
   );
 };

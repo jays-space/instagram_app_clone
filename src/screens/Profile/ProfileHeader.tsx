@@ -3,6 +3,9 @@ import React, {memo} from 'react';
 import {Auth} from 'aws-amplify';
 import {useNavigation} from '@react-navigation/native';
 
+// CONTEXTS
+import {useAuthContext} from '../../contexts/AuthContext';
+
 // TYPES
 import {ProfileNavigationProp} from '../../types/navigation';
 import {User} from '../../API';
@@ -20,6 +23,9 @@ interface IProfileHeader {
 
 const ProfileHeader = ({user}: IProfileHeader) => {
   const navigation = useNavigation<ProfileNavigationProp>();
+  const {currentUserId} = useAuthContext();
+
+  const isCurrentUser = user?.id === currentUserId; // check if the current user profile is being viewed by current user
 
   const navigateToEditProfile = () => {
     navigation.navigate('Edit Profile');
@@ -58,10 +64,12 @@ const ProfileHeader = ({user}: IProfileHeader) => {
       </View>
 
       {/* Tab buttons container  */}
-      <View style={styles.tabButtons}>
-        <Button title="Edit Profile" inline onPress={navigateToEditProfile} />
-        <Button title="Sign Out" inline onPress={() => Auth.signOut()} />
-      </View>
+      {isCurrentUser && (
+        <View style={styles.tabButtons}>
+          <Button title="Edit Profile" inline onPress={navigateToEditProfile} />
+          <Button title="Sign Out" inline onPress={() => Auth.signOut()} />
+        </View>
+      )}
     </View>
   );
 };

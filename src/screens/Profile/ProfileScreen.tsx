@@ -35,10 +35,10 @@ const ProfileScreen = () => {
 
   const {currentUserId} = useAuthContext();
 
-  const {data, loading, error} = useQuery<GetUserQuery, GetUserQueryVariables>(
-    getUser,
-    {variables: {id: userId || currentUserId}},
-  );
+  const {data, loading, error, refetch} = useQuery<
+    GetUserQuery,
+    GetUserQueryVariables
+  >(getUser, {variables: {id: userId || currentUserId}});
   const user = data?.getUser;
 
   if (loading) {
@@ -50,6 +50,7 @@ const ProfileScreen = () => {
       <ApiErrorMessage
         title="Error fetching the user profile"
         message={error?.message || 'User not found'}
+        onRetry={() => refetch()}
       />
     );
   }
@@ -60,6 +61,8 @@ const ProfileScreen = () => {
       <FeedGridView
         data={user?.Posts?.items || []}
         ListHeaderComponent={() => <ProfileHeader user={user} />}
+        refetch={refetch}
+        loading={loading}
       />
     </SafeAreaView>
   );

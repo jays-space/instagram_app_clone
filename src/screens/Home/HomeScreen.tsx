@@ -20,7 +20,7 @@ import {ApiErrorMessage} from '../../components/ApiErrorMessage';
 const HomeScreen = () => {
   const [viewableItemIndex, setViewableItemIndex] = useState<number>(0);
 
-  const {data, loading, error} = useQuery<
+  const {data, loading, error, refetch} = useQuery<
     ListPostsQuery,
     ListPostsQueryVariables
   >(listPosts);
@@ -66,6 +66,8 @@ const HomeScreen = () => {
       showsVerticalScrollIndicator={false}
       onViewableItemsChanged={onViewableItemsChanged.current}
       viewabilityConfig={viewabilityConfig}
+      refreshing={loading}
+      onRefresh={refetch}
     />
   );
 };

@@ -11,7 +11,7 @@ import {useForm, Control, Controller} from 'react-hook-form';
 import * as ImagePicker from 'react-native-image-picker';
 
 // TYPES
-import {IUser} from '../../types/models';
+import {User} from '../../API';
 
 // STYLES
 import {colors} from '../../theme/colors';
@@ -24,7 +24,7 @@ import user from '../../mock/user.json';
 //* However, Pick enables us to select specific keys we'd like to pass into the new type.
 //* This makes it such that if we edit/update the original interface/type, we automatically get the edits to the picked keys in the new type as well
 type IEditableUserField = 'name' | 'username' | 'bio' | 'website' | 'image';
-type IEditableUser = Pick<IUser, IEditableUserField>;
+type IEditableUser = Pick<User, IEditableUserField>;
 
 interface ICustomInput {
   label: string;
@@ -62,7 +62,7 @@ const CustomInput = ({
               placeholder={label}
               onChangeText={onChange}
               onBlur={onBlur}
-              value={value}
+              value={value || ''}
               multiline={multiline}
               style={[
                 styles.input,

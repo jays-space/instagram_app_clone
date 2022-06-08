@@ -24,7 +24,7 @@ const HomeStackNavigator = () => {
       <Stack.Screen
         name="UserProfile"
         component={ProfileScreen}
-        options={{title: 'Other User Profile'}}
+        options={{title: 'Profile'}}
       />
     </Stack.Navigator>
   );
