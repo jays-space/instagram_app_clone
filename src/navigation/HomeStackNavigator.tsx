@@ -15,17 +15,13 @@ const HomeStackNavigator = () => {
   return (
     <Stack.Navigator
       initialRouteName="Feed"
-      screenOptions={{headerShown: true}}>
+      screenOptions={{headerShown: true, headerTitleAlign: 'center'}}>
       <Stack.Screen
         name="Feed"
         component={HomeScreen}
-        options={{headerTitle: HeaderTitle, headerTitleAlign: 'center'}}
+        options={{headerTitle: HeaderTitle}}
       />
-      <Stack.Screen
-        name="UserProfile"
-        component={ProfileScreen}
-        options={{title: 'Profile'}}
-      />
+      <Stack.Screen name="UserProfile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 };

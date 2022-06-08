@@ -1,16 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   SafeAreaView,
-  StyleSheet,
   Text,
-  TextInput,
-  View,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {useMutation, useQuery} from '@apollo/client';
-import {useForm, Control, Controller} from 'react-hook-form';
+import {useLazyQuery, useMutation, useQuery} from '@apollo/client';
+import {useForm} from 'react-hook-form';
 import * as ImagePicker from 'react-native-image-picker';
 
 // CONTEXTS
@@ -22,84 +20,24 @@ import {
   GetUserQueryVariables,
   UpdateUserMutation,
   UpdateUserMutationVariables,
-  User,
+  UsersByUsernameQuery,
+  UsersByUsernameQueryVariables,
 } from '../../API';
+import {IEditableUser} from '../../components/CustomInput/CustomInput.component';
 
 // GQL
-import {getUser, updateUser} from './queries';
+import {getUser, updateUser, usersByUsername} from './queries';
 
 // COMPONENTS
 import {ApiErrorMessage} from '../../components/ApiErrorMessage';
+import {CustomInput} from '../../components/CustomInput';
 
 // STYLES
-import {colors} from '../../theme/colors';
-import fonts from '../../theme/fonts';
+import {styles} from './EditProfileScreen.styles';
 import {DEFAULT_USER_IMAGE} from '../../config';
-
-//* Creates a new type based on another type.
-//* However, Pick enables us to select specific keys we'd like to pass into the new type.
-//* This makes it such that if we edit/update the original interface/type, we automatically get the edits to the picked keys in the new type as well
-type IEditableUserField = 'name' | 'username' | 'bio' | 'website' | 'image';
-type IEditableUser = Pick<User, IEditableUserField>;
-
-interface ICustomInput {
-  label: string;
-  name: IEditableUserField;
-  control: Control<IEditableUser, object>;
-  rules?: object;
-  multiline?: boolean;
-}
 
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-
-const CustomInput = ({
-  label = 'Your label',
-  name,
-  control,
-  rules = {},
-  multiline = false,
-}: ICustomInput) => (
-  <Controller
-    control={control}
-    name={name}
-    rules={rules}
-    render={({
-      field: {onChange, onBlur, value},
-      fieldState: {error, isTouched},
-    }) => {
-      return (
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>{label}</Text>
-
-          {/* Input & Error text1 */}
-          <View style={{flex: 1}}>
-            <TextInput
-              placeholder={label}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              value={value || ''}
-              multiline={multiline}
-              style={[
-                styles.input,
-                {
-                  borderColor:
-                    error && isTouched ? colors.error : colors.border,
-                },
-              ]}
-            />
-
-            {error && isTouched && (
-              <Text style={{color: colors.error}}>
-                {error.message || error.type}
-              </Text>
-            )}
-          </View>
-        </View>
-      );
-    }}
-  />
-);
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -113,6 +51,17 @@ const EditProfileScreen = () => {
   const {data, loading, error} = useQuery<GetUserQuery, GetUserQueryVariables>(
     getUser,
     {variables: {id: currentUserId}},
+  );
+
+  const [
+    onGetUsernames,
+    {
+      // data: getUsernamesDate,
+      // loading: getUsernamesLoading,
+      // error: getUsernamesError,
+    },
+  ] = useLazyQuery<UsersByUsernameQuery, UsersByUsernameQueryVariables>(
+    usersByUsername,
   );
 
   const [onUpdateUserStart, {loading: updateLoading, error: updateError}] =
@@ -146,7 +95,9 @@ const EditProfileScreen = () => {
       variables: {input: {id: user?.id, ...formData, _version: user?._version}},
     });
 
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   };
 
   const onChangePhoto = () => {
@@ -159,6 +110,33 @@ const EditProfileScreen = () => {
         }
       },
     );
+  };
+
+  const validateUsername = async (username: string) => {
+    // query the db based on the usersByUsername
+    try {
+      const response = await onGetUsernames({variables: {username}});
+
+      if (error) {
+        Alert.alert('Failed to get the username');
+        return 'Failed to get the username';
+      }
+
+      const users = response?.data?.usersByUsername?.items;
+
+      // if there are any users with the same username, then return error
+      if (users && users?.length > 0 && users[0]?.id !== currentUserId) {
+        console.log('taken');
+        return 'Username is already taken';
+      }
+    } catch (e) {
+      Alert.alert('Failed to get the username');
+    }
+
+    // return valid (username is available)
+    console.log('true');
+
+    return true;
   };
 
   if (loading) {
@@ -207,6 +185,7 @@ const EditProfileScreen = () => {
             value: 3,
             message: 'Username should be more that 3 characters.',
           },
+          validate: validateUsername,
         }}
         label="Username"
       />
@@ -241,38 +220,3 @@ const EditProfileScreen = () => {
 };
 
 export default EditProfileScreen;
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 10,
-  },
-  avatar: {
-    width: '30%',
-    aspectRatio: 1,
-
-    borderRadius: 100,
-  },
-  button: {
-    color: colors.primary,
-    fontSize: fonts.size.md,
-    fontWeight: fonts.weight.semi_bold,
-
-    margin: 10,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-  },
-  label: {
-    width: '20%',
-  },
-  input: {
-    borderBottomWidth: 1,
-    // borderColor: colors.border,
-
-    minHeight: 50,
-  },
-});

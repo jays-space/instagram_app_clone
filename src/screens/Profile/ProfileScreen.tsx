@@ -28,7 +28,6 @@ const ProfileScreen = () => {
     MyProfileNavigationProp | UserProfileNavigationProp
   >();
   const {params} = useRoute<MyProfileRouteProp | UserProfileRouteProp>();
-  // navigation.setOptions({title: username}); //* change screen title
 
   // query the user with userID
   const userId = params?.userId;
@@ -40,6 +39,8 @@ const ProfileScreen = () => {
     GetUserQueryVariables
   >(getUser, {variables: {id: userId || currentUserId}});
   const user = data?.getUser;
+
+  navigation.setOptions({title: user?.username || ''}); //* change screen title
 
   if (loading) {
     return <ActivityIndicator />;

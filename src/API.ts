@@ -360,6 +360,12 @@ export type ModelUserConnection = {
   startedAt?: number | null,
 };
 
+export enum ModelSortDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
+
 export type CreateLikeMutationVariables = {
   input: CreateLikeInput,
   condition?: ModelLikeConditionInput | null,
@@ -2190,6 +2196,54 @@ export type SyncUsersQueryVariables = {
 
 export type SyncUsersQuery = {
   syncUsers?:  {
+    __typename: "ModelUserConnection",
+    items:  Array< {
+      __typename: "User",
+      id: string,
+      name: string,
+      username?: string | null,
+      image?: string | null,
+      bio?: string | null,
+      website?: string | null,
+      nofPosts: number,
+      nofFollowers: number,
+      nofFollowings: number,
+      Posts?:  {
+        __typename: "ModelPostConnection",
+        nextToken?: string | null,
+        startedAt?: number | null,
+      } | null,
+      Comments?:  {
+        __typename: "ModelCommentConnection",
+        nextToken?: string | null,
+        startedAt?: number | null,
+      } | null,
+      Likes?:  {
+        __typename: "ModelLikeConnection",
+        nextToken?: string | null,
+        startedAt?: number | null,
+      } | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type UsersByUsernameQueryVariables = {
+  username: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelUserFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type UsersByUsernameQuery = {
+  usersByUsername?:  {
     __typename: "ModelUserConnection",
     items:  Array< {
       __typename: "User",
