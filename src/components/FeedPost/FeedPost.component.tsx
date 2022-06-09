@@ -5,13 +5,28 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
+import {useMutation, useQuery} from '@apollo/client';
+
+// CONTEXTS
+import {useAuthContext} from '../../contexts/AuthContext';
 
 // TYPES
-import {Post as PostType} from '../../API';
+import {
+  CreateLikeMutation,
+  CreateLikeMutationVariables,
+  DeleteLikeMutation,
+  DeleteLikeMutationVariables,
+  LikesForPostByUserQuery,
+  LikesForPostByUserQueryVariables,
+  Post as PostType,
+} from '../../API';
 import {
   FeedNavigationProp,
   FeedPOstToCommentsNavigationProp,
 } from '../../types/navigation';
+
+// GQL
+import {createLike, deleteLike, likesForPostByUser} from './queries';
 
 // COMPONENTS
 import {Comment} from '../Comment';
@@ -34,14 +49,53 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
   const feedPostNavigation = useNavigation<FeedNavigationProp>();
   const rootNavigation = useNavigation<FeedPOstToCommentsNavigationProp>();
 
+  const {currentUserId} = useAuthContext();
+
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(false);
-  const [isPostLiked, setIsPostLiked] = useState<boolean>(false);
+
+  // on component render, fetch all likes by this user for this post
+  const {data: usersLikeData} = useQuery<
+    LikesForPostByUserQuery,
+    LikesForPostByUserQueryVariables
+  >(likesForPostByUser, {
+    variables: {postID: post?.id, userID: {eq: currentUserId}},
+  });
+
+  const currentUserLike = usersLikeData?.LikesForPostByUser?.items?.filter(
+    like => !like?._deleted,
+  )?.[0]; // a like by the current user => if there is not data at [0], the we return undefined (falsy value)
+
+  // on like create, create the like then refetch LikesForPostByUser
+  const [onCreateLike] = useMutation<
+    CreateLikeMutation,
+    CreateLikeMutationVariables
+  >(createLike, {
+    variables: {input: {userID: currentUserId, postID: post?.id}}, // gets all likes by the current user for this post
+    refetchQueries: ['LikesForPostByUser'], // an arr of queries to run after this mutation likes CRUD (15:00:00)
+  });
+
+  const [onDeletePost] = useMutation<
+    DeleteLikeMutation,
+    DeleteLikeMutationVariables
+  >(deleteLike, {refetchQueries: ['LikesForPostByUser']});
 
   const toggleDescriptionExpanded = () =>
     setIsDescriptionExpanded(value => !value); //? Updating local state in 'real-time' and not async 3.5 State for Likes @ 15:00
 
-  const togglePostLike = () => setIsPostLiked(value => !value);
+  const togglePostLike = () => {
+    if (currentUserLike) {
+      // if the current user likes, delete the like
+      onDeletePost({
+        variables: {
+          input: {id: currentUserLike?.id, _version: currentUserLike?._version},
+        },
+      });
+    } else {
+      // if the current user does not like, create the like
+      onCreateLike();
+    }
+  };
 
   const navigateToProfile = () => {
     if (post?.User) {
@@ -111,10 +165,10 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         <View style={styles.iconContainer}>
           <Pressable onPress={togglePostLike}>
             <AntDesign
-              name={isPostLiked ? 'heart' : 'hearto'}
+              name={currentUserLike ? 'heart' : 'hearto'}
               size={24}
               style={styles.icon}
-              color={isPostLiked ? colors.accent : colors.black}
+              color={currentUserLike ? colors.accent : colors.black}
             />
           </Pressable>
           <Ionicons

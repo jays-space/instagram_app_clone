@@ -1,7 +1,12 @@
 type Like @model @auth(rules: [{allow: public}]) {
   id: ID!
   userID: ID! @index(name: "byUser")
-  postID: ID! @index(name: "byPost")
+  postID: ID!
+    @index(
+      name: "byPost"
+      queryField: "LikesForPostByUser"
+      sortKeyFields: ["userID"]
+    )
 
   User: User @belongsTo(fields: ["userID"])
   Post: Post @belongsTo(fields: ["postID"])
@@ -34,7 +39,8 @@ type Post @model @auth(rules: [{allow: public}]) {
 type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
-  username: String @index(name: "usersByUsername", queryField: "usersByUsername")
+  username: String
+    @index(name: "usersByUsername", queryField: "usersByUsername")
   image: String
   bio: String
   website: String
