@@ -1,6 +1,6 @@
 import React, {memo, useState} from 'react';
 import {Image, Pressable, Text, View} from 'react-native';
-import Entypo from 'react-native-vector-icons/Entypo';
+
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -8,7 +8,10 @@ import {useNavigation} from '@react-navigation/native';
 
 // TYPES
 import {Post as PostType} from '../../API';
-import {FeedNavigationProp} from '../../types/navigation';
+import {
+  FeedNavigationProp,
+  FeedPOstToCommentsNavigationProp,
+} from '../../types/navigation';
 
 // COMPONENTS
 import {Comment} from '../Comment';
@@ -16,6 +19,7 @@ import {DoublePressable} from '../DoublePressable';
 import {Carousel} from '../Carousel';
 import {VideoPlayer} from '../VideoPlayer';
 import {DEFAULT_USER_IMAGE} from '../../config';
+import PostMenu from './PostMenu';
 
 // STYLES
 import {styles} from './FeedPost.styles';
@@ -27,7 +31,8 @@ interface IFeedPost {
 }
 
 const FeedPost = ({post, isViewable = null}: IFeedPost) => {
-  const navigation = useNavigation<FeedNavigationProp>();
+  const feedPostNavigation = useNavigation<FeedNavigationProp>();
+  const rootNavigation = useNavigation<FeedPOstToCommentsNavigationProp>();
 
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(false);
@@ -40,14 +45,14 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
 
   const navigateToProfile = () => {
     if (post?.User) {
-      navigation.navigate('UserProfile', {
+      feedPostNavigation.navigate('UserProfile', {
         userId: post.User?.id, //* if no userID, send currentUserID instead
       });
     }
   };
 
   const navigateToComments = () => {
-    navigation.navigate('Comments', {
+    rootNavigation.navigate('Comments', {
       postId: post.id,
     });
   };
@@ -94,11 +99,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         </Pressable>
 
         {/* more options icon */}
-        <Entypo
-          name="dots-three-horizontal"
-          size={16}
-          style={styles.optionsIcon}
-        />
+        <PostMenu post={post} />
       </View>
 
       {/* Content */}

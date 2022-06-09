@@ -21,9 +21,6 @@ export const styles = StyleSheet.create({
     fontWeight: fonts.weight.bold,
     color: colors.black,
   },
-  optionsIcon: {
-    marginLeft: 'auto',
-  },
   post: {},
   image: {
     width: '100%',

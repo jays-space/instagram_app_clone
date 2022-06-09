@@ -9,6 +9,11 @@ export type RootNavigatorParamList = {
   'Edit Profile': undefined;
 };
 
+export type FeedPOstToCommentsNavigationProp = BottomTabNavigationProp<
+  RootNavigatorParamList,
+  'Comments'
+>;
+
 export type BottomTabNavigatorParamList = {
   HomeStack: undefined;
   Search: undefined;
@@ -27,12 +32,37 @@ export type MyProfileRouteProp = RouteProp<
   'MyProfile'
 >;
 
+export type CreateStackNavigatorParamList = {
+  Camera: undefined;
+  Create: {image?: string; images?: string[]; video?: string};
+};
+
+export type CameraNavigationProp = NativeStackNavigationProp<
+  CreateStackNavigatorParamList,
+  'Camera'
+>;
+
+export type CreateNavigationProp = NativeStackNavigationProp<
+  CreateStackNavigatorParamList,
+  'Create'
+>;
+
+export type CreateRouteProp = RouteProp<
+  CreateStackNavigatorParamList,
+  'Create'
+>;
+
 export type HomeStackNavigatorParamList = {
   Feed: undefined;
   UserProfile: {userId: string};
-  UpdatePost: {id: string};
+  UpdatePost: {postId: string};
   PostLikes: {id: string};
 };
+
+export type UpdatePostRouteProp = RouteProp<
+  HomeStackNavigatorParamList,
+  'UpdatePost'
+>;
 
 export type UserProfileNavigationProp = NativeStackNavigationProp<
   HomeStackNavigatorParamList,

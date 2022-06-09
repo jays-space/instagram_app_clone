@@ -45,7 +45,7 @@ const linkingConfig: LinkingOptions<RootNavigatorParamList> = {
 
 const Navigation = () => {
   const {currentUser, currentUserId} = useAuthContext();
-  const {data, loading, error} = useQuery<GetUserQuery, GetUserQueryVariables>(
+  const {data, loading} = useQuery<GetUserQuery, GetUserQueryVariables>(
     getUser,
     {variables: {id: currentUserId}},
   );

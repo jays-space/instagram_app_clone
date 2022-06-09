@@ -10,8 +10,9 @@ import {BottomTabNavigatorParamList} from '../types/navigation';
 // NAVIGATORS
 import HomeStackNavigator from './HomeStackNavigator';
 import ProfileStackNavigator from './ProfileStackNavigator';
-import {PostUploadScreen} from '../screens/PostUploadScreen';
 import SearchTabNavigator from './SearchTabNavigator';
+import {CameraScreen} from '../screens/CameraScreen';
+import {UploadStackNavigator} from './UploadStackNavigator';
 
 // STYLES
 import {colors} from '../theme/colors';
@@ -48,7 +49,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Upload"
-        component={PostUploadScreen}
+        component={UploadStackNavigator}
         options={{
           headerShown: false,
           tabBarIcon: ({color, size}) => (
@@ -62,7 +63,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Notifications"
-        component={PostUploadScreen}
+        component={CameraScreen}
         options={{
           tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons

@@ -16,6 +16,10 @@ import {
   VideoQuality,
 } from 'expo-camera';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
+
+// TYPES
+import {CameraNavigationProp} from '../../types/navigation';
 
 // STYLES
 import {colors} from '../../theme/colors';
@@ -34,7 +38,8 @@ const flashModeToIcon = {
   [FlashMode.torch]: 'highlight',
 };
 
-const PostUploadScreen = () => {
+const CameraScreen = () => {
+  const navigation = useNavigation<CameraNavigationProp>();
   const [hasPermissions, setHasPermissions] = useState<boolean | null>(null);
   const [isCameraReady, setIsCameraReady] = useState<boolean>(false);
   const [isCameraRecording, setIsCameraRecording] = useState<boolean>(false);
@@ -57,6 +62,17 @@ const PostUploadScreen = () => {
 
     getPermission();
   }, []);
+
+  const navigateToCreateScreen = () => {
+    navigation.navigate('Create', {
+      images: [
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/4.jpg',
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/3.jpg',
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/2.jpg',
+        'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/images/1.jpg',
+      ],
+    });
+  };
 
   //   Toggle which camera which is in use
   const flipCamera = () => {
@@ -205,6 +221,15 @@ const PostUploadScreen = () => {
             color={colors.white}
           />
         </Pressable>
+
+        {/* Simulate picture taking */}
+        <Pressable onPress={navigateToCreateScreen}>
+          <MaterialIcons
+            name="arrow-forward-ios"
+            size={30}
+            color={colors.white}
+          />
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -250,4 +275,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostUploadScreen;
+export default CameraScreen;

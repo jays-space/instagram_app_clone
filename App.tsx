@@ -2,6 +2,8 @@ import React from 'react';
 import {Linking} from 'react-native';
 import RootTabNavigator from './src/navigation';
 import {Amplify} from 'aws-amplify';
+import {MenuProvider} from 'react-native-popup-menu';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 // @ts-ignore
 // import {withAuthenticator} from 'aws-amplify-react-native';
 import config from './src/aws-exports';
@@ -35,11 +37,15 @@ Amplify.configure(updatedConfig);
 
 const App = () => {
   return (
-    <AuthContextProvider>
-      <Client>
-        <RootTabNavigator />
-      </Client>
-    </AuthContextProvider>
+    <SafeAreaProvider>
+      <MenuProvider>
+        <AuthContextProvider>
+          <Client>
+            <RootTabNavigator />
+          </Client>
+        </AuthContextProvider>
+      </MenuProvider>
+    </SafeAreaProvider>
   );
 };
 

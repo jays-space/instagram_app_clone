@@ -8,10 +8,10 @@ import {colors} from '../../theme/colors';
 
 interface IVideoPlayer {
   video: string;
-  paused: boolean;
+  paused?: boolean;
 }
 
-const VideoPlayer = ({video, paused}: IVideoPlayer) => {
+const VideoPlayer = ({video, paused = true}: IVideoPlayer) => {
   const [isMuted, setIsMuted] = useState(true);
 
   //   if (!viewableItemIndex) {

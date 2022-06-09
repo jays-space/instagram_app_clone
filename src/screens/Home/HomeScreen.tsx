@@ -48,7 +48,7 @@ const HomeScreen = () => {
     );
   }
 
-  const POSTS = data?.listPosts?.items || [];
+  const POSTS = (data?.listPosts?.items || []).filter(post => !post?._deleted);
 
   return (
     <FlatList
