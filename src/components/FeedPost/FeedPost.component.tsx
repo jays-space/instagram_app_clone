@@ -19,6 +19,8 @@ import {
   LikesForPostByUserQuery,
   LikesForPostByUserQueryVariables,
   Post as PostType,
+  UpdatePostMutation,
+  UpdatePostMutationVariables,
 } from '../../API';
 import {
   FeedNavigationProp,
@@ -26,7 +28,12 @@ import {
 } from '../../types/navigation';
 
 // GQL
-import {createLike, deleteLike, likesForPostByUser} from './queries';
+import {
+  createLike,
+  deleteLike,
+  likesForPostByUser,
+  updatePost,
+} from './queries';
 
 // COMPONENTS
 import {Comment} from '../Comment';
@@ -65,6 +72,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
   const currentUserLike = usersLikeData?.LikesForPostByUser?.items?.filter(
     like => !like?._deleted,
   )?.[0]; // a like by the current user => if there is not data at [0], the we return undefined (falsy value)
+  const postLikes = post.Likes?.items.filter(like => !like?._deleted) || [];
 
   // on like create, create the like then refetch LikesForPostByUser
   const [onCreateLike] = useMutation<
@@ -80,8 +88,25 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
     DeleteLikeMutationVariables
   >(deleteLike, {refetchQueries: ['LikesForPostByUser']});
 
+  const [onUpdatePost] = useMutation<
+    UpdatePostMutation,
+    UpdatePostMutationVariables
+  >(updatePost);
+
   const toggleDescriptionExpanded = () =>
     setIsDescriptionExpanded(value => !value); //? Updating local state in 'real-time' and not async 3.5 State for Likes @ 15:00
+
+  const incrementNofLike = (amount: 1 | -1) => {
+    onUpdatePost({
+      variables: {
+        input: {
+          id: post?.id,
+          _version: post?._version,
+          nofLikes: post?.nofLikes + amount,
+        },
+      },
+    });
+  };
 
   const togglePostLike = () => {
     if (currentUserLike) {
@@ -91,9 +116,11 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
           input: {id: currentUserLike?.id, _version: currentUserLike?._version},
         },
       });
+      incrementNofLike(-1);
     } else {
       // if the current user does not like, create the like
       onCreateLike();
+      incrementNofLike(1);
     }
   };
 
@@ -103,6 +130,12 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         userId: post.User?.id, //* if no userID, send currentUserID instead
       });
     }
+  };
+
+  const navigateToPostLikes = () => {
+    feedPostNavigation.navigate('PostLikes', {
+      postId: post?.id,
+    });
   };
 
   const navigateToComments = () => {
@@ -193,16 +226,27 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
         </View>
 
         {/* likes */}
-        <Text style={styles.text}>
-          Liked by <Text style={styles.bold}>{post?.User?.username}</Text> and{' '}
-          <Text style={styles.bold}>
-            {(post?.nofLikes - 1).toString()} others
+        {postLikes.length === 0 ? (
+          <Text>Be the first to like the post</Text>
+        ) : (
+          <Text style={styles.text} onPress={navigateToPostLikes}>
+            Liked by{' '}
+            <Text style={styles.bold}>{postLikes?.[0]?.User?.username}</Text>{' '}
+            {postLikes.length > 1 && (
+              <>
+                and{' '}
+                <Text style={styles.bold}>
+                  {(post?.nofLikes - 1).toString()} others
+                </Text>
+              </>
+            )}
           </Text>
-        </Text>
+        )}
 
         {/* post description */}
         <Text style={styles.text} numberOfLines={isDescriptionExpanded ? 0 : 3}>
-          <Text style={styles.bold}>jaymondlana</Text> {post?.description}
+          <Text style={styles.bold}>{post?.User?.username}</Text>{' '}
+          {post?.description}
         </Text>
 
         <Text onPress={toggleDescriptionExpanded}>

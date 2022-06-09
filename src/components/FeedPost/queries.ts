@@ -55,12 +55,28 @@ export const likesForPostByUser = gql`
         id
         userID
         postID
-
         createdAt
         updatedAt
         _version
         _deleted
         _lastChangedAt
+
+        Post {
+          id
+          nofLikes
+          Likes {
+            items {
+              id
+              _deleted
+              _version
+            }
+            nextToken
+            startedAt
+          }
+          _version
+          _deleted
+          _lastChangedAt
+        }
       }
       nextToken
       startedAt
@@ -76,6 +92,23 @@ export const deleteLike = gql`
     deleteLike(input: $input, condition: $condition) {
       id
 
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+    }
+  }
+`;
+
+export const updatePost = gql`
+  mutation UpdatePost(
+    $input: UpdatePostInput!
+    $condition: ModelPostConditionInput
+  ) {
+    updatePost(input: $input, condition: $condition) {
+      id
+      nofLikes
+      createdAt
       updatedAt
       _version
       _deleted
