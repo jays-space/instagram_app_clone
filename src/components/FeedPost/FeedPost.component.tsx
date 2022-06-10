@@ -5,35 +5,13 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
-import {useMutation, useQuery} from '@apollo/client';
-
-// CONTEXTS
-import {useAuthContext} from '../../contexts/AuthContext';
 
 // TYPES
-import {
-  CreateLikeMutation,
-  CreateLikeMutationVariables,
-  DeleteLikeMutation,
-  DeleteLikeMutationVariables,
-  LikesForPostByUserQuery,
-  LikesForPostByUserQueryVariables,
-  Post as PostType,
-  UpdatePostMutation,
-  UpdatePostMutationVariables,
-} from '../../API';
+import {Post as PostType} from '../../API';
 import {
   FeedNavigationProp,
   FeedPOstToCommentsNavigationProp,
 } from '../../types/navigation';
-
-// GQL
-import {
-  createLike,
-  deleteLike,
-  likesForPostByUser,
-  updatePost,
-} from './queries';
 
 // COMPONENTS
 import {Comment} from '../Comment';
@@ -46,6 +24,7 @@ import PostMenu from './PostMenu';
 // STYLES
 import {styles} from './FeedPost.styles';
 import {colors} from '../../theme/colors';
+import {useLikeService} from '../../services/LikeService/';
 
 interface IFeedPost {
   post: PostType;
@@ -56,73 +35,14 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
   const feedPostNavigation = useNavigation<FeedNavigationProp>();
   const rootNavigation = useNavigation<FeedPOstToCommentsNavigationProp>();
 
-  const {currentUserId} = useAuthContext();
+  const {toggleLike, isLiked} = useLikeService(post);
+  const postLikes = post.Likes?.items.filter(like => !like?._deleted) || [];
 
   const [isDescriptionExpanded, setIsDescriptionExpanded] =
     useState<boolean>(false);
 
-  // on component render, fetch all likes by this user for this post
-  const {data: usersLikeData} = useQuery<
-    LikesForPostByUserQuery,
-    LikesForPostByUserQueryVariables
-  >(likesForPostByUser, {
-    variables: {postID: post?.id, userID: {eq: currentUserId}},
-  });
-
-  const currentUserLike = usersLikeData?.LikesForPostByUser?.items?.filter(
-    like => !like?._deleted,
-  )?.[0]; // a like by the current user => if there is not data at [0], the we return undefined (falsy value)
-  const postLikes = post.Likes?.items.filter(like => !like?._deleted) || [];
-
-  // on like create, create the like then refetch LikesForPostByUser
-  const [onCreateLike] = useMutation<
-    CreateLikeMutation,
-    CreateLikeMutationVariables
-  >(createLike, {
-    variables: {input: {userID: currentUserId, postID: post?.id}}, // gets all likes by the current user for this post
-    refetchQueries: ['LikesForPostByUser'], // an arr of queries to run after this mutation likes CRUD (15:00:00)
-  });
-
-  const [onDeletePost] = useMutation<
-    DeleteLikeMutation,
-    DeleteLikeMutationVariables
-  >(deleteLike, {refetchQueries: ['LikesForPostByUser']});
-
-  const [onUpdatePost] = useMutation<
-    UpdatePostMutation,
-    UpdatePostMutationVariables
-  >(updatePost);
-
   const toggleDescriptionExpanded = () =>
     setIsDescriptionExpanded(value => !value); //? Updating local state in 'real-time' and not async 3.5 State for Likes @ 15:00
-
-  const incrementNofLike = (amount: 1 | -1) => {
-    onUpdatePost({
-      variables: {
-        input: {
-          id: post?.id,
-          _version: post?._version,
-          nofLikes: post?.nofLikes + amount,
-        },
-      },
-    });
-  };
-
-  const togglePostLike = () => {
-    if (currentUserLike) {
-      // if the current user likes, delete the like
-      onDeletePost({
-        variables: {
-          input: {id: currentUserLike?.id, _version: currentUserLike?._version},
-        },
-      });
-      incrementNofLike(-1);
-    } else {
-      // if the current user does not like, create the like
-      onCreateLike();
-      incrementNofLike(1);
-    }
-  };
 
   const navigateToProfile = () => {
     if (post?.User) {
@@ -147,7 +67,7 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
   let content = null;
   if (post.image) {
     content = (
-      <DoublePressable onDoublePress={togglePostLike}>
+      <DoublePressable onDoublePress={toggleLike}>
         <Image
           source={{
             uri: post?.image,
@@ -158,10 +78,10 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
       </DoublePressable>
     );
   } else if (post?.images && post?.images?.length > 0) {
-    content = <Carousel images={post.images} onDoublePress={togglePostLike} />;
+    content = <Carousel images={post.images} onDoublePress={toggleLike} />;
   } else if (post?.video) {
     content = (
-      <DoublePressable onDoublePress={togglePostLike}>
+      <DoublePressable onDoublePress={toggleLike}>
         <VideoPlayer video={post.video} paused={!isViewable} />
       </DoublePressable>
     );
@@ -196,12 +116,12 @@ const FeedPost = ({post, isViewable = null}: IFeedPost) => {
       <View style={styles.footer}>
         {/* icons */}
         <View style={styles.iconContainer}>
-          <Pressable onPress={togglePostLike}>
+          <Pressable onPress={toggleLike}>
             <AntDesign
-              name={currentUserLike ? 'heart' : 'hearto'}
+              name={isLiked ? 'heart' : 'hearto'}
               size={24}
               style={styles.icon}
-              color={currentUserLike ? colors.accent : colors.black}
+              color={isLiked ? colors.accent : colors.black}
             />
           </Pressable>
           <Ionicons
